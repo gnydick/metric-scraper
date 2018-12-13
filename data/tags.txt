@@ -1,0 +1,19 @@
+3905 pod_name
+3905 namespace
+3905 name
+3905 image
+3905 id
+3905 container_name
+ 836 tcp_state
+ 433 device
+ 380 state
+ 304 udp_state
+ 304 type
+ 304 scope
+ 272 interface
+  52 cpu
+   1 osVersion
+   1 kernelVersion
+   1 dockerVersion
+   1 cadvisorVersion
+   1 cadvisorRevision
