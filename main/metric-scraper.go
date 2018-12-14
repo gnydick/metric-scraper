@@ -33,7 +33,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/healthz", GetHealthz).Methods("GET")
 
-	config := c.FileBuild("main/service.json")
+	config := c.FileBuild("main/cadvisor.json")
 
 	scraperPtr := s.NewScraper(&config)
 	go scraperPtr.Run()
@@ -50,6 +50,6 @@ func GetHealthz(w http.ResponseWriter, r *http.Request) {
 	health := make(map[string]string)
 	health["uptime"] = strconv.FormatFloat(uptime().Seconds(), 10, 1, 64)
 	health["hostname"], _ = os.Hostname()
-	// health["metrics_reported"] = strconv.FormatInt(s.MetricsReported(), 10)
+	health["metrics_reported"] = strconv.FormatInt(s.(), 10)
 	json.NewEncoder(w).Encode(health)
 }

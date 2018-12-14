@@ -6,20 +6,20 @@ import (
 
 	c "github.com/gnydick/metric-scraper/config"
 	e "github.com/gnydick/metric-scraper/emitters"
-	s "github.com/gnydick/metric-scraper/sink"
+	k "github.com/gnydick/metric-scraper/sink"
 )
 
 type Service struct {
 	config *c.Config
 	scheme string
-	sink   s.Sink
+	sink   k.Sink
 }
 
-func NewService(config *c.Config, scheme string, sink s.Sink) (Service) {
+func NewService(config *c.Config, scheme string, sink k.Sink) (Service) {
 	service := Service{
 		config: config,
 		scheme: scheme,
-		sink:   sink,
+		sink: sink,
 	}
 	return service
 }

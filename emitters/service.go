@@ -2,15 +2,15 @@ package emitters
 
 import (
 	"bufio"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	c "github.com/gnydick/metric-scraper/config"
+	dataService "github.com/gnydick/metric-scraper/data/service"
 	m "github.com/gnydick/metric-scraper/metric"
 	k "github.com/gnydick/metric-scraper/sink"
 )
@@ -52,10 +52,10 @@ func NewService(sink k.Sink, c *c.Config, url string, identTag string) (Service)
 
 }
 
-func (svc Service) parseLine(timestamp int64, line *string) (m.Metric) {
+func (svc Service) parseLine(timestamp int64, line *string) (*m.Metric) {
 	serviceMetric := m.Service{}
 	metric := serviceMetric.Unmarshal(timestamp, line)
-	return metric
+	return &metric
 }
 
 func (svc Service) cleanText (text *string) (string) {
@@ -63,21 +63,29 @@ func (svc Service) cleanText (text *string) (string) {
 	return cleanedText
 }
 
-func (svc Service) Scan(sink k.Sink) {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	resp, err := http.Get(svc.url)
+func (svc Service) Scan() {
+	ds := dataService.NewDataSet()
+	svc.sink.AddClient()
+	// http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	// resp, err := http.Get(svc.url)
+	//
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer resp.Body.Close()
+	// body, err := ioutil.ReadAll(resp.Body)
 
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	// scanner := bufio.NewScanner(strings.NewReader(string(body)))
+	file, _ := os.Open("data/cadvisor.txt")
 
-	scanner := bufio.NewScanner(strings.NewReader(string(body)))
 
+	scanner := bufio.NewScanner(bufio.NewReader(file))
 	newMetric := false
 	gotType := false
-	sinkChan := sink.GetChannel()
+	// sinkChan := sink.GetChannel()
+
+
+
 
 	for scanner.Scan() {
 		now := time.Now()
@@ -100,11 +108,14 @@ func (svc Service) Scan(sink k.Sink) {
 		} else if gotType == true {
 
 			metricPtr := svc.parseLine(millis, &line)
-			sinkChan <- metricPtr
+			fmt.Println(metricPtr)
+			ds.RegisterMetric(svc.parseLine(millis, &line))
+			// *sinkChan <- *metricPtr
 
 		}
 
 	}
-	sink.SubWg(1)
-
+	fmt.Println(ds)
+	svc.sink.RemoveClient()
 }
+

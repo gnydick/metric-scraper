@@ -7,10 +7,9 @@ import (
 
 type Sink interface {
 	Send()
-	GetChannel() (chan m.Metric)
-	AddWg(i int)
-	SubWg(i int)
-	WaitWg()
+	GetChannel() (*chan *m.Metric)
+	AddClient()
+	RemoveClient()
 }
 
 
