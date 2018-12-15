@@ -1,54 +1,58 @@
-package metric_scraper
+package main
 
 import (
-	"encoding/json"
-	"log"
-	"net/http"
-	"os"
-	"strconv"
-	"time"
+    "encoding/json"
+    "github.com/Unknwon/log"
+    "github.com/gorilla/mux"
+    "net/http"
+    "os"
+    "strconv"
+    "time"
 
-	"github.com/gorilla/mux"
-	c "github.com/gnydick/metric-scraper/config"
-	s "github.com/gnydick/metric-scraper/scraper"
+    c "github.com/gnydick/metric-scraper/config"
+    s "github.com/gnydick/metric-scraper/scraper"
+    . "github.com/gnydick/metric-scraper/util"
 )
 
 var startTime time.Time
 
-var debug bool
-var deploymentId string
-var kind string
-var disco string
-var orch string
-var ident string
-var interval string
-
 func init() {
 
-	startTime = time.Now()
+    startTime = time.Now()
 
 }
 
 func main() {
-	router := mux.NewRouter()
-	router.HandleFunc("/healthz", GetHealthz).Methods("GET")
 
-	config := c.FileBuild("main/cadvisor.json")
+    router := mux.NewRouter()
+    router.HandleFunc("/healthz", GetHealthz).Methods("GET")
 
-	scraperPtr := s.NewScraper(&config)
-	go scraperPtr.Run()
+    configPath := os.Getenv("CONFIG_PATH")
 
-	log.Fatal(http.ListenAndServe(":8765", router))
+    config := c.FileBuild(configPath)
+    if config.Debug() {
+        LogLevel = DEBUG
+    }
+
+
+    DebugLog("Starting up")
+    scraperPtr := s.NewScraper(&config)
+    scraperPtr.Scrape()
+    _err := http.ListenAndServe(":8765", router)
+    if _err != nil {
+        log.Fatal(_err.Error())
+    }
+
 }
 
 func uptime() time.Duration {
-	return time.Since(startTime)
+    return time.Since(startTime)
 }
 
 func GetHealthz(w http.ResponseWriter, r *http.Request) {
-	health := make(map[string]string)
-	health["uptime"] = strconv.FormatFloat(uptime().Seconds(), 10, 1, 64)
-	health["hostname"], _ = os.Hostname()
-	health["metrics_reported"] = strconv.FormatInt(0.0, 10)
-	json.NewEncoder(w).Encode(health)
+    health := make(map[string]string)
+    health["uptime"] = strconv.FormatFloat(uptime().Seconds(), 10, 1, 64)
+    health["hostname"], _ = os.Hostname()
+    health["metrics_reported"] = strconv.FormatInt(0.0, 10)
+    json.NewEncoder(w).Encode(health)
 }

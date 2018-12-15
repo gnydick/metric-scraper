@@ -1,10 +1,12 @@
 package scraper
 
 import (
+    "fmt"
+
     c "github.com/gnydick/metric-scraper/config"
-    m "github.com/gnydick/metric-scraper/metric"
     k "github.com/gnydick/metric-scraper/sink"
     t "github.com/gnydick/metric-scraper/targeting"
+    . "github.com/gnydick/metric-scraper/util"
     "sync"
     "time"
 )
@@ -16,33 +18,34 @@ type Scraper struct {
     sink            k.Sink
 }
 
+var x = 0
+
 func NewScraper(configPtr *c.Config) (*Scraper) {
-    sinkChan := make(chan *m.Metric)
     var scraper Scraper
-    var sink k.Sink
+
+    var sink interface{}
     switch sinkKind := configPtr.Sink(); sinkKind {
     case "opentsdb":
-        sink = k.NewOpentsdbSink(configPtr, &sinkChan, &sync.WaitGroup{})
+        var otsdb = k.NewOpentsdbSink(configPtr, &sync.WaitGroup{})
+        sink = otsdb
     }
-
-    // var _ t.Target = (*t.Cadvisor)(nil)
 
     switch kind := configPtr.Kind(); kind {
     case "cadvisor":
-        target := t.NewCadvisor(configPtr, "http", sink)
+        target := t.NewCadvisor(configPtr, "http", sink.(k.Sink))
         scraper = Scraper{
             config:          configPtr,
             metricsReported: 0,
             target:          target,
-            sink:            sink,
+            sink:            sink.(k.Sink),
         }
     case "service":
-        target := t.NewService(configPtr, "http", sink)
+        target := t.NewService(configPtr, "http", sink.(k.Sink))
         scraper = Scraper{
             config:          configPtr,
             metricsReported: 0,
             target:          target,
-            sink:            sink,
+            sink:            sink.(k.Sink),
         }
     }
 
@@ -57,25 +60,27 @@ func (s Scraper) IncrMetricsReported() {
     s.metricsReported += 1
 }
 
-func (s Scraper) ScrapeRoutine(targetPtr *t.Target) {
-    var d time.Duration
-    d, _ = time.ParseDuration(s.config.Interval())
-    s.scrape(targetPtr)
-    for {
-        time.Sleep(d)
-        s.scrape(targetPtr)
-    }
-}
-
-func (s Scraper) Run() {
-    s.ScrapeRoutine(&s.target)
-}
-
-func (s Scraper) scrape(targetPtr *t.Target) {
-
-    for _, emitter := range (*targetPtr).EmitterPtrs() {
-
-        go emitter.Scan()
-    }
+func (s Scraper) Scrape() {
+    DebugLog("Starting scrape")
+    d, _ := time.ParseDuration(s.config.Interval())
     go s.sink.Send()
+    for {
+
+        x += 1
+        DebugLog("go'ing send")
+
+        for _, emitter := range (s.target).EmitterPtrs() {
+            DebugLog(fmt.Sprintf("client count before: %d", s.sink.ClientCount()))
+            DebugLog(fmt.Sprintf("client count after: %d", s.sink.ClientCount()))
+            DebugLog("going scan")
+            go emitter.Scan()
+
+        }
+
+        DebugLog("After wait")
+
+
+        DebugLog("Made it to the end of scrape")
+        time.Sleep(d)
+    }
 }

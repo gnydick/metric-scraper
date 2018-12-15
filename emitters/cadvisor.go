@@ -2,10 +2,11 @@ package emitters
 
 import (
     "bufio"
+    "crypto/tls"
     "encoding/json"
     "fmt"
+    "io/ioutil"
     "net/http"
-    "os"
     "strings"
     "time"
 
@@ -13,6 +14,7 @@ import (
     dataCadv "github.com/gnydick/metric-scraper/data/cadvisor"
     m "github.com/gnydick/metric-scraper/metric"
     k "github.com/gnydick/metric-scraper/sink"
+    . "github.com/gnydick/metric-scraper/util"
 )
 
 type Cadvisor struct {
@@ -39,16 +41,16 @@ func NewCadvisor(sink k.Sink, c *c.Config, url string, identTag string) (Cadviso
     if err != nil {
         panic(err)
     }
-    // cfgMap := cfg.(map[string]interface{})
-    //
-    // configText := cfgMap["config"].(string)
+    cfgMap := cfg.(map[string]interface{})
+
+    configText := cfgMap["config"].(string)
 
     emitter := Cadvisor{
         url:       url,
-        blacklist: make([]string, 0),
+        blacklist: strings.Split(configText, ","),
         identTag:  identTag,
         sink:      sink,
-        ds:         ds,
+        ds:        ds,
     }
 
     return emitter
@@ -56,37 +58,30 @@ func NewCadvisor(sink k.Sink, c *c.Config, url string, identTag string) (Cadviso
 }
 
 func (c Cadvisor) parseLine(timestamp int64, line *string) (*m.Metric) {
-    // cleanedText := c.cleanText(line)
-    cadv := m.Cadvisor{}
-    metric := cadv.Unmarshal(timestamp, *line)
-    return &metric
+
+    metric := m.CadvUnmarshal(timestamp, line)
+    return metric
 }
 
-func (c Cadvisor) cleanText(text *string) (string) {
-    cleanedText := strings.Replace(strings.Replace(strings.Replace(*text, `"`, ``, -1), `,`, ` `, -1), `:`, `_`, -1)
-    return cleanedText
-}
+func (e Cadvisor) Scan() {
+    DebugLog("Starting scan")
 
-func (c Cadvisor) Scan() {
-    c.sink.AddClient()
+    http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+    resp, err := http.Get(e.url)
 
-    //
-    // http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-    // resp, err := http.Get(c.url)
-    //
-    // if err != nil {
-    // 	panic(err)
-    // }
-    // defer resp.Body.Close()
-    // body, err := ioutil.ReadAll(resp.Body)
-    //
-    // scanner := bufio.NewScanner(strings.NewReader(string(body)))
-    file, _ := os.Open("data/cadvisor.txt")
+    if err != nil {
+    	panic(err)
+    }
+    defer resp.Body.Close()
+    body, err := ioutil.ReadAll(resp.Body)
 
-    scanner := bufio.NewScanner(bufio.NewReader(file))
+    scanner := bufio.NewScanner(strings.NewReader(string(body)))
+
+
     newMetric := false
     gotType := false
-    sinkChan := c.sink.GetChannel()
+    sinkChan := e.sink.GetChannel()
+    DebugLog("About to scan file")
     for scanner.Scan() {
         now := time.Now()
         nanos := now.UnixNano()
@@ -106,19 +101,30 @@ func (c Cadvisor) Scan() {
                 gotType = true
             }
         } else if gotType == true {
-            c.ds.RegisterMetric(c.parseLine(millis, &line))
+            e.ds.RegisterMetric(e.parseLine(millis, &line))
 
         }
 
     }
-    for _, container := range *c.ds.GetContainers() {
+    conts := 0
+    for _, container := range *e.ds.GetContainers() {
+        conts += 1
+        mets := 0
+        DebugLog(fmt.Sprintf("%d Containers", conts))
         for _, metric := range *container.GetMetrics() {
+            mets += 1
+            DebugLog(fmt.Sprintf("%d Metrics", mets))
             *sinkChan <- metric
         }
     }
-    close(*sinkChan)
-    fmt.Println(c.ds)
-    c.sink.RemoveClient()
-    fmt.Println("Removed client")
+
+    DebugLog(fmt.Sprintf("%s", e.ds))
+    DebugLog("Releasing Channel")
+    DebugLog(fmt.Sprintf("client count before: %d", e.sink.ClientCount()))
+    DebugLog("ending scan")
+
+    // c.sink.RemoveClient()
+    DebugLog(fmt.Sprintf("client count after: %d", e.sink.ClientCount()))
+    DebugLog("Removed client")
 
 }

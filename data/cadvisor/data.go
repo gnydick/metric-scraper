@@ -2,6 +2,7 @@ package cadvisor
 
 import (
     m "github.com/gnydick/metric-scraper/metric"
+    "regexp"
 )
 
 type Pod struct {
@@ -40,7 +41,18 @@ func (ds *DataSet) RegisterMetric(metric *m.Metric) {
         switch key := k; key {
         case "container_name":
             containerName := v
-            if len(containerName) > 0 && containerName != "POD" {
+            if len(containerName) > 0 {
+                switch cName := containerName; cName {
+                case "POD":
+                    metricName := (*metric).Metric
+                    re := regexp.MustCompile(`(?P<container>container)_(?P<theRest>[a-z\-]+)`)
+                    matches := re.FindStringSubmatchIndex(metricName)
+                    if matches != nil {
+                        var newMetricNameBytes []byte
+                        (*metric).Metric = string(re.ExpandString(newMetricNameBytes, "pod_${theRest}", metricName, matches))
+                    }
+
+                }
                 container := (*ds).getOrCreateContainer(&containerName)
                 (*ds).fixUpContainer(container, metric)
             }
@@ -88,6 +100,10 @@ func (ds *DataSet) fixUpContainer(container *Container, metric *m.Metric) {
         container.name = (*ds).getTagValue("name", metric)
     }
 
+    if (*ds).hasTagKey("container_name", metric) && (*ds).getTagValue("container_name", metric) == "POD" {
+        delete ((*metric).Tags, "container_name")
+    }
+
 }
 
 func (ds *DataSet) fixUpPod(pod *Pod, metric *m.Metric) {
@@ -95,6 +111,10 @@ func (ds *DataSet) fixUpPod(pod *Pod, metric *m.Metric) {
         if (*ds).hasTagKey("pod_name", metric) {
             pod.podName = (*ds).getTagValue("pod_name", metric)
         }
+    }
+
+    if (*ds).hasTagKey("container_name", metric) && (*ds).getTagValue("container_name", metric) == "POD" {
+        delete ((*metric).Tags, "container_name")
     }
 }
 

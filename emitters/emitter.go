@@ -5,7 +5,6 @@ import (
 )
 
 type Emitter interface {
-	cleanText (text *string) (string)
 	parseLine(timestamp int64, line *string) (*m.Metric)
 	Scan()
 }
