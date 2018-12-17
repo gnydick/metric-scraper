@@ -41,13 +41,12 @@ func NewCadvisor(sink k.Sink, c *c.Config, url string, identTag string) (Cadviso
     if err != nil {
         panic(err)
     }
-    cfgMap := cfg.(map[string]interface{})
+    // cfgMap := cfg.(map[string]interface{})
 
-    configText := cfgMap["config"].(string)
+    // configText := cfgMap["config"].(string)
 
     emitter := Cadvisor{
         url:       url,
-        blacklist: strings.Split(configText, ","),
         identTag:  identTag,
         sink:      sink,
         ds:        ds,

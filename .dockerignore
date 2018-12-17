@@ -1,0 +1,8 @@
+.idea
+helm
+.gitignore
+*.json
+Dockerfile
+*.iml
+README.md
+.dockerignore

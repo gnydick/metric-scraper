@@ -45,7 +45,7 @@ func (ds *DataSet) RegisterMetric(metric *m.Metric) {
                 switch cName := containerName; cName {
                 case "POD":
                     metricName := (*metric).Metric
-                    re := regexp.MustCompile(`(?P<container>container)_(?P<theRest>[a-z\-]+)`)
+                    re := regexp.MustCompile(`(?P<container>container)_(?P<theRest>.*)`)
                     matches := re.FindStringSubmatchIndex(metricName)
                     if matches != nil {
                         var newMetricNameBytes []byte

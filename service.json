@@ -7,5 +7,6 @@
   "interval": "5s",
   "orch": "_http._tcp.orch.default.svc.cluster.local",
   "metric": "_telnet._tcp.opentsdb-write.default.svc.cluster.local",
-  "sink": "opentsdb"
+  "sink": "opentsdb",
+  "mode": "development"
 }

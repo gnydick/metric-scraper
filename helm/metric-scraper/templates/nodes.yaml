@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "metric-scraper.fullname" . }}-{{ .Values.targets.nodes.name }}
+  labels:
+    app: {{ template "metric-scraper.name" . }}-{{ .Values.targets.nodes.name }}
+    chart: {{ template "metric-scraper.chart" . }}-{{ .Values.targets.nodes.name }}
+    release: {{ .Release.Name }}-{{ .Values.targets.nodes.name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "metric-scraper.name" . }}-{{ .Values.targets.nodes.name }}
+      release: {{ .Release.Name }}-{{ .Values.targets.nodes.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "metric-scraper.name" . }}-{{ .Values.targets.nodes.name }}
+        release: {{ .Release.Name }}-{{ .Values.targets.nodes.name }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      containers:
+        - name: {{ .Chart.Name }}-{{ .Values.targets.nodes.name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.healthz.port }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.healthz.port }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
