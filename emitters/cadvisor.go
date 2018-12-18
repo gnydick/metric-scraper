@@ -18,6 +18,7 @@ import (
 )
 
 type Cadvisor struct {
+    node      string
     url       string
     blacklist []string
     identTag  string
@@ -25,7 +26,7 @@ type Cadvisor struct {
     ds        *dataCadv.DataSet
 }
 
-func NewCadvisor(sink k.Sink, c *c.Config, url string, identTag string) (Cadvisor) {
+func NewCadvisor(node string, sink k.Sink, c *c.Config, url string, identTag string) (Cadvisor) {
     ds := dataCadv.NewDataSet()
     orchUrl := fmt.Sprintf("http://%s/api/rest/v1/config/%s:%s", c.Orch(), c.DeploymentId(), "scraper_tag_blacklist:tag_key_blacklist:default")
     resp, err := http.Get(orchUrl)
@@ -50,6 +51,7 @@ func NewCadvisor(sink k.Sink, c *c.Config, url string, identTag string) (Cadviso
         identTag:  identTag,
         sink:      sink,
         ds:        ds,
+        node:      node,
     }
 
     return emitter
@@ -59,6 +61,7 @@ func NewCadvisor(sink k.Sink, c *c.Config, url string, identTag string) (Cadviso
 func (c Cadvisor) parseLine(timestamp int64, line *string) (*m.Metric) {
 
     metric := m.CadvUnmarshal(timestamp, line)
+    (*metric).Tags["node"] = c.node
     return metric
 }
 
