@@ -37,17 +37,21 @@ func main() {
 
     DebugLog("Starting up")
     scraperPtr := s.NewScraper(&config)
-    scraperPtr.Scrape()
-    _err := http.ListenAndServe(":8765", router)
-    if _err != nil {
-        log.Fatal(_err.Error())
-    }
 
+    go func() {
+        _err := http.ListenAndServe(":8765", router)
+        if _err != nil {
+            log.Fatal(_err.Error())
+        }
+    }()
+
+    scraperPtr.Scrape()
 }
 
 func uptime() time.Duration {
     return time.Since(startTime)
 }
+
 
 func GetHealthz(w http.ResponseWriter, r *http.Request) {
     health := make(map[string]string)
