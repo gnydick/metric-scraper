@@ -62,10 +62,10 @@ func (c Cadvisor) EmitterPtrs() ([]e.Emitter) {
     if err != nil {
         panic(err.Error())
     }
-    emitters := make([]e.Emitter, 1)
-    for _, node := range nodes.Items {
+    emitters := make([]e.Emitter, len(nodes.Items))
+    for i, node := range nodes.Items {
         emitter := e.NewCadvisor(c.sink, c.configPtr, &node)
-        emitters[0] = emitter
+        emitters[i] = emitter
     }
     return emitters
 }
