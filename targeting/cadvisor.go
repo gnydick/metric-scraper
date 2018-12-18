@@ -1,7 +1,6 @@
 package targeting
 
 import (
-    "fmt"
     c "github.com/gnydick/metric-scraper/config"
     e "github.com/gnydick/metric-scraper/emitters"
     k "github.com/gnydick/metric-scraper/sink"
@@ -65,9 +64,7 @@ func (c Cadvisor) EmitterPtrs() ([]e.Emitter) {
     }
     emitters := make([]e.Emitter, 1)
     for _, node := range nodes.Items {
-        emitter := e.NewCadvisor(c.sink, c.configPtr,
-            fmt.Sprintf("http://%s:%s/metrics/cadvisor", node.ObjectMeta.Name, "10255"),
-            "node="+node.Name)
+        emitter := e.NewCadvisor(c.sink, c.configPtr, &node)
         emitters[0] = emitter
     }
     return emitters

@@ -3,9 +3,9 @@ package emitters
 import (
     "bufio"
     "crypto/tls"
-    "encoding/json"
     "fmt"
     "io/ioutil"
+    "k8s.io/api/core/v1"
     "net/http"
     "strings"
     "time"
@@ -18,40 +18,19 @@ import (
 )
 
 type Cadvisor struct {
-    node      string
-    url       string
-    blacklist []string
-    identTag  string
-    sink      k.Sink
-    ds        *dataCadv.DataSet
+    url  string
+    sink k.Sink
+    ds   *dataCadv.DataSet
+    node *v1.Node
 }
 
-func NewCadvisor(node string, sink k.Sink, c *c.Config, url string, identTag string) (Cadvisor) {
+func NewCadvisor(sink k.Sink, c *c.Config, node *v1.Node) (Cadvisor) {
     ds := dataCadv.NewDataSet()
-    orchUrl := fmt.Sprintf("http://%s/api/rest/v1/config/%s:%s", c.Orch(), c.DeploymentId(), "scraper_tag_blacklist:tag_key_blacklist:default")
-    resp, err := http.Get(orchUrl)
-    if err != nil {
-        panic(err)
-    }
-    defer resp.Body.Close()
-    var cfg interface{}
-
-    config := json.RawMessage{}
-    json.NewDecoder(resp.Body).Decode(&config)
-    err = json.Unmarshal(config, &cfg)
-    if err != nil {
-        panic(err)
-    }
-    // cfgMap := cfg.(map[string]interface{})
-
-    // configText := cfgMap["config"].(string)
-
     emitter := Cadvisor{
-        url:       url,
-        identTag:  identTag,
-        sink:      sink,
-        ds:        ds,
-        node:      node,
+        url:  fmt.Sprintf("http://%s:%s/metrics/cadvisor", node.Name, "10255"),
+        sink: sink,
+        ds:   ds,
+        node: node,
     }
 
     return emitter
@@ -61,7 +40,12 @@ func NewCadvisor(node string, sink k.Sink, c *c.Config, url string, identTag str
 func (c Cadvisor) parseLine(timestamp int64, line *string) (*m.Metric) {
 
     metric := m.CadvUnmarshal(timestamp, line)
-    (*metric).Tags["node"] = c.node
+    if len((*metric).Tags) == 0 {
+        (*metric).Tags = make(map[string]string)
+    }
+
+    (*metric).Tags["node"] = c.node.ObjectMeta.Name
+
     return metric
 }
 
@@ -72,13 +56,12 @@ func (e Cadvisor) Scan() {
     resp, err := http.Get(e.url)
 
     if err != nil {
-    	panic(err)
+        panic(err)
     }
     defer resp.Body.Close()
     body, err := ioutil.ReadAll(resp.Body)
 
     scanner := bufio.NewScanner(strings.NewReader(string(body)))
-
 
     newMetric := false
     gotType := false
