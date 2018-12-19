@@ -64,7 +64,8 @@ func (c Cadvisor) EmitterPtrs() ([]e.Emitter) {
     }
     emitters := make([]e.Emitter, len(nodes.Items))
     for i, node := range nodes.Items {
-        emitter := e.NewCadvisor(c.sink, c.configPtr, &node)
+        newInst := node // have to create a new instance as 'node' gets destroyed in each loop
+        emitter := e.NewCadvisor(c.sink, c.configPtr, &newInst)
         emitters[i] = emitter
     }
     return emitters

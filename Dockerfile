@@ -11,5 +11,3 @@ RUN go build -o metric-scraper .
 USER appuser
 WORKDIR /go/bin
 CMD [ "./metric-scraper" ]
-
-
