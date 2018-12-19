@@ -4,10 +4,14 @@
     <list default="true" id="6b5d52f5-8d10-4d20-91e5-b45effda4bb6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/service/data.go" beforeDir="false" afterPath="$PROJECT_DIR$/data/service/data.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/emitters/cadvisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/emitters/cadvisor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/emitters/emitter.go" beforeDir="false" afterPath="$PROJECT_DIR$/emitters/emitter.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/emitters/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/emitters/service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/metric/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/metric/service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/opentsdb.go" beforeDir="false" afterPath="$PROJECT_DIR$/output/opentsdb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/metric-scraper.go" beforeDir="false" afterPath="$PROJECT_DIR$/metric-scraper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scraper/scraper.go" beforeDir="false" afterPath="$PROJECT_DIR$/scraper/scraper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service.json" beforeDir="false" afterPath="$PROJECT_DIR$/ksm.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sink/opentsdb.go" beforeDir="false" afterPath="$PROJECT_DIR$/sink/opentsdb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/targeting/cadvisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/targeting/cadvisor.go" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -32,8 +36,8 @@
           <entry key="Dockerfile" value="3" />
           <entry key="dockerignore" value="1" />
           <entry key="gitignore" value="1" />
-          <entry key="go" value="313" />
-          <entry key="json" value="13" />
+          <entry key="go" value="324" />
+          <entry key="json" value="14" />
           <entry key="s" value="18" />
           <entry key="sample" value="4" />
           <entry key="sh" value="3" />
@@ -47,8 +51,8 @@
           <entry key="Docker file" value="1" />
           <entry key="Dockerfile" value="3" />
           <entry key="Git file" value="1" />
-          <entry key="Go" value="313" />
-          <entry key="JSON" value="13" />
+          <entry key="Go" value="324" />
+          <entry key="JSON" value="14" />
           <entry key="PLAIN_TEXT" value="10" />
           <entry key="YAML" value="3" />
           <entry key="x86 Plan9 Assembly" value="18" />
@@ -58,10 +62,10 @@
         <counts>
           <entry key="Dockerfile" value="179" />
           <entry key="dockerignore" value="45" />
-          <entry key="go" value="13910" />
-          <entry key="json" value="153" />
+          <entry key="go" value="14925" />
+          <entry key="json" value="168" />
           <entry key="sh" value="189" />
-          <entry key="txt" value="239" />
+          <entry key="txt" value="316" />
           <entry key="yaml" value="57" />
         </counts>
       </usages-collector>
@@ -70,9 +74,9 @@
           <entry key="Bash" value="189" />
           <entry key="Docker file" value="45" />
           <entry key="Dockerfile" value="179" />
-          <entry key="Go" value="13910" />
-          <entry key="JSON" value="153" />
-          <entry key="PLAIN_TEXT" value="239" />
+          <entry key="Go" value="14925" />
+          <entry key="JSON" value="168" />
+          <entry key="PLAIN_TEXT" value="316" />
           <entry key="YAML" value="57" />
         </counts>
       </usages-collector>
@@ -88,132 +92,101 @@
     </session>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.45723805">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/targeting/cadvisor.go">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="900">
-                  <caret line="66" column="8" selection-start-line="66" selection-start-column="8" selection-end-line="66" selection-end-column="8" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/emitters/cadvisor.go">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-1">
-                  <folding>
-                    <element signature="e#18#404#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/metric/cadvisor.go">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="259">
-                  <caret line="14" column="5" selection-start-line="14" selection-start-column="5" selection-end-line="14" selection-end-column="5" />
-                  <folding>
-                    <element signature="e#16#77#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/metric/service.go">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="133">
-                  <caret line="12" column="5" selection-start-line="12" selection-start-column="5" selection-end-line="12" selection-end-column="5" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/config/config.go">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-57">
-                  <caret line="52" column="17" selection-start-line="52" selection-start-column="17" selection-end-line="52" selection-end-column="17" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/metric/metric.go">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="76">
-                  <caret line="4" column="4" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/cadvisor/data.go">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1248">
-                  <caret line="98" column="34" selection-start-line="98" selection-start-column="34" selection-end-line="98" selection-end-column="34" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/emitters/service.go">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="634">
-                  <caret line="97" column="45" selection-start-line="97" selection-start-column="45" selection-end-line="97" selection-end-column="45" />
-                  <folding>
-                    <element signature="e#18#378#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/service/data.go">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="171">
-                  <caret line="9" column="24" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
-                  <folding>
-                    <element signature="e#17#76#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/sink/opentsdb.go">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="432">
-                  <caret line="61" column="46" selection-start-line="61" selection-start-column="46" selection-end-line="61" selection-end-column="46" />
-                  <folding>
-                    <element signature="e#14#279#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/output/opentsdb.go">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="344">
-                  <caret line="21" column="47" selection-start-line="21" selection-start-column="47" selection-end-line="21" selection-end-column="47" />
-                  <folding>
-                    <element signature="e#16#130#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/targeting/cadvisor.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="133">
+              <caret line="15" column="20" lean-forward="true" selection-start-line="15" selection-start-column="20" selection-end-line="15" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/scraper/scraper.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="325">
+              <caret line="40" column="64" selection-start-line="40" selection-start-column="64" selection-end-line="40" selection-end-column="64" />
+              <folding>
+                <element signature="e#17#255#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file:///usr/local/go/src/runtime/panic.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="432">
+              <caret line="587" selection-start-line="587" selection-end-line="587" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/targeting/targeting.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="95">
+              <caret line="9" column="9" lean-forward="true" selection-start-line="9" selection-start-column="9" selection-end-line="9" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/emitters/emitter.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="114">
+              <caret line="8" column="6" selection-start-line="8" selection-start-column="6" selection-end-line="8" selection-end-column="6" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/emitters/cadvisor.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-471">
+              <caret line="16" column="45" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/sink/opentsdb.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="581">
+              <caret line="61" column="13" selection-start-line="61" selection-start-column="13" selection-end-line="61" selection-end-column="13" />
+              <folding>
+                <element signature="e#14#279#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/output/opentsdb.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="382">
+              <caret line="21" selection-start-line="21" selection-end-line="21" />
+              <folding>
+                <element signature="e#16#130#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/emitters/service.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="736">
+              <caret line="47" column="35" selection-start-line="47" selection-start-column="35" selection-end-line="47" selection-end-column="35" />
+              <folding>
+                <element signature="e#18#378#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -224,23 +197,17 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>cont</find>
-      <find>tags</find>
-      <find>line</find>
-      <find>ds</find>
       <find>*Service</find>
       <find>tag</find>
       <find>getmetr</find>
       <find>container</find>
       <find>unmar</find>
-      <find>svcRe</find>
       <find>marsh</find>
       <find>mars</find>
       <find>metrics</find>
       <find>HERE</find>
       <find>BEFORE</find>
       <find>container=</find>
-      <find>container:</find>
       <find>, metric</find>
       <find>parseline</find>
       <find>received</find>
@@ -254,6 +221,12 @@
       <find>&quot;node&quot;</find>
       <find>tags(</find>
       <find>make</find>
+      <find>container:</find>
+      <find>zumhelm</find>
+      <find>svcRe</find>
+      <find>DebugLog</find>
+      <find>Sent</find>
+      <find>adminserver</find>
     </findStrings>
     <replaceStrings>
       <replace>(ds *DataSet)</replace>
@@ -295,7 +268,6 @@
         <option value="$PROJECT_DIR$/sink/sink.go" />
         <option value="$PROJECT_DIR$/util/debug.go" />
         <option value="$PROJECT_DIR$/util/logger.go" />
-        <option value="$PROJECT_DIR$/scraper/scraper.go" />
         <option value="$PROJECT_DIR$/util/multiLevelLogger.go" />
         <option value="$PROJECT_DIR$/helm/metric-scraper/values.yaml" />
         <option value="$PROJECT_DIR$/helm/metric-scraper/templates/nodes.yaml" />
@@ -306,16 +278,18 @@
         <option value="$PROJECT_DIR$/metric-scraper.go" />
         <option value="$PROJECT_DIR$/metric/cadvisor.go" />
         <option value="$PROJECT_DIR$/Dockerfile" />
-        <option value="$PROJECT_DIR$/emitters/emitter.go" />
-        <option value="$PROJECT_DIR$/targeting/cadvisor.go" />
         <option value="$PROJECT_DIR$/.git/hooks/post-receive.sh" />
         <option value="$PROJECT_DIR$/service.json" />
-        <option value="$PROJECT_DIR$/emitters/cadvisor.go" />
         <option value="$PROJECT_DIR$/metric/service.go" />
         <option value="$PROJECT_DIR$/output/opentsdb.go" />
-        <option value="$PROJECT_DIR$/sink/opentsdb.go" />
-        <option value="$PROJECT_DIR$/emitters/service.go" />
         <option value="$PROJECT_DIR$/data/service/data.go" />
+        <option value="$PROJECT_DIR$/ksm.json" />
+        <option value="$PROJECT_DIR$/targeting/cadvisor.go" />
+        <option value="$PROJECT_DIR$/emitters/emitter.go" />
+        <option value="$PROJECT_DIR$/emitters/service.go" />
+        <option value="$PROJECT_DIR$/emitters/cadvisor.go" />
+        <option value="$PROJECT_DIR$/scraper/scraper.go" />
+        <option value="$PROJECT_DIR$/sink/opentsdb.go" />
       </list>
     </option>
   </component>
@@ -657,7 +631,7 @@
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545242922787" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545247111174" />
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -706,7 +680,7 @@
       <working_directory value="$PROJECT_DIR$" />
       <parameters value="-race" />
       <envs>
-        <env name="CONFIG_PATH" value="service.json" />
+        <env name="CONFIG_PATH" value="cadvisor.json" />
       </envs>
       <kind value="FILE" />
       <filePath value="$PROJECT_DIR$/metric-scraper.go" />
@@ -738,16 +712,15 @@
       <workItem from="1544663089793" duration="32413000" />
       <workItem from="1544820925352" duration="12979000" />
       <workItem from="1545070346531" duration="16987000" />
-      <workItem from="1545175265137" duration="14094000" />
+      <workItem from="1545175265137" duration="18273000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="76473000" />
+    <option name="totallyTimeSpent" value="80652000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="3008" y="0" width="3008" height="1692" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7125604" visible="true" weight="0.08626522" />
       <window_info id="Structure" order="1" sideWeight="0.2874396" side_tool="true" weight="0.13464141" />
@@ -758,13 +731,13 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32995567" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.5456298" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.29892337" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.5452818" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.3470551" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Amazon EC2" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.29820052" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.29765674" />
       <window_info anchor="bottom" id="Docker" order="9" />
       <window_info anchor="bottom" id="AWS Tail" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
@@ -797,24 +770,6 @@
           <line>2</line>
           <option name="timeStamp" value="137" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/emitters/cadvisor.go</url>
-          <line>89</line>
-          <properties />
-          <option name="timeStamp" value="175" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/targeting/cadvisor.go</url>
-          <line>34</line>
-          <properties />
-          <option name="timeStamp" value="177" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/emitters/service.go</url>
-          <line>101</line>
-          <properties />
-          <option name="timeStamp" value="195" />
-        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
@@ -828,6 +783,31 @@
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="breakpointCondition">
+      <expression>
+        <expression-string>(*metric).Tags[&quot;container_name&quot;]==&quot;adminserver&quot;</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>(*metric).Tags[&quot;container&quot;]==&quot;adminserver&quot;</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>metric.Tags[&quot;container_name&quot;]==&quot;adminserver&quot;</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>*metric.Tags[&quot;container_name&quot;]==&quot;adminserver&quot;</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>len((*metric).Tags[&quot;container_name&quot;]) &gt; 0</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>(*s).hasTagKey(&quot;container&quot;, *metric) == true</expression-string>
         <language-id>go</language-id>
@@ -845,36 +825,6 @@
       </expression>
       <expression>
         <expression-string>metric.Metric == &quot;kube_daemonset_created&quot;</expression-string>
-        <language-id>go</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>metric.Metric == &quot;kube_pod_container_status_restarts_total&quot;</expression-string>
-        <language-id>go</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>kube_pod_container_status_restarts_total</expression-string>
-        <language-id>go</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>(*metric).Value != 0</expression-string>
-        <language-id>go</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>*metric.Value != 0</expression-string>
-        <language-id>go</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>container</expression-string>
-        <language-id>go</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>containerName==&quot;jenkins&quot;</expression-string>
         <language-id>go</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -970,23 +920,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="189">
           <caret line="456" selection-start-line="456" selection-end-line="456" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/targeting/targeting.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="9" column="16" selection-start-line="9" selection-start-column="16" selection-end-line="9" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sink/sink.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="10" column="7" selection-start-line="10" selection-start-column="7" selection-end-line="10" selection-end-column="7" />
-          <folding>
-            <element signature="e#14#70#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1128,13 +1061,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/emitters/emitter.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="7" column="14" lean-forward="true" selection-start-line="7" selection-start-column="14" selection-end-line="7" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.git/hooks/prepare-commit-msg.sample">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="361">
@@ -1162,37 +1088,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scraper/scraper.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="778">
-          <caret line="83" column="17" selection-start-line="83" selection-start-column="13" selection-end-line="83" selection-end-column="17" />
-          <folding>
-            <element signature="e#17#255#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/targeting/cadvisor.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="900">
-          <caret line="66" column="8" selection-start-line="66" selection-start-column="8" selection-end-line="66" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/service.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="228">
-          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/metric/metric.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="4" column="4" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/targeting/service.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="455">
@@ -1213,41 +1108,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/metric/service.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
-          <caret line="12" column="5" selection-start-line="12" selection-start-column="5" selection-end-line="12" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/cadvisor/data.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1248">
-          <caret line="98" column="34" selection-start-line="98" selection-start-column="34" selection-end-line="98" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/go/src/runtime/panic.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="586" column="12" lean-forward="true" selection-start-line="586" selection-start-column="12" selection-end-line="586" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/config.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-57">
           <caret line="52" column="17" selection-start-line="52" selection-start-column="17" selection-end-line="52" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sink/opentsdb.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="61" column="46" selection-start-line="61" selection-start-column="46" selection-end-line="61" selection-end-column="46" />
-          <folding>
-            <element signature="e#14#279#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1261,41 +1125,125 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/emitters/cadvisor.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1">
-          <folding>
-            <element signature="e#18#404#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/output/opentsdb.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="344">
-          <caret line="21" column="47" selection-start-line="21" selection-start-column="47" selection-end-line="21" selection-end-column="47" />
-          <folding>
-            <element signature="e#16#130#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/service/data.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="9" column="24" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
+        <state relative-caret-position="437">
+          <caret line="23" column="33" selection-start-line="23" selection-start-column="33" selection-end-line="23" selection-end-column="33" />
           <folding>
             <element signature="e#17#76#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/metric/service.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="12" column="5" selection-start-line="12" selection-start-column="5" selection-end-line="12" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/metric/metric.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="76">
+          <caret line="4" column="4" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ksm.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/cadvisor/data.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1248">
+          <caret line="98" column="34" selection-start-line="98" selection-start-column="34" selection-end-line="98" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sink/sink.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="8" column="4" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
+          <folding>
+            <element signature="e#14#70#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/output/opentsdb.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="382">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
+          <folding>
+            <element signature="e#16#130#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/targeting/targeting.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="9" column="9" lean-forward="true" selection-start-line="9" selection-start-column="9" selection-end-line="9" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/targeting/cadvisor.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="15" column="20" lean-forward="true" selection-start-line="15" selection-start-column="20" selection-end-line="15" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/emitters/service.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="634">
-          <caret line="97" column="45" selection-start-line="97" selection-start-column="45" selection-end-line="97" selection-end-column="45" />
+        <state relative-caret-position="736">
+          <caret line="47" column="35" selection-start-line="47" selection-start-column="35" selection-end-line="47" selection-end-column="35" />
           <folding>
             <element signature="e#18#378#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/emitters/emitter.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="8" column="6" selection-start-line="8" selection-start-column="6" selection-end-line="8" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/emitters/cadvisor.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-471">
+          <caret line="16" column="45" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/go/src/runtime/panic.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="587" selection-start-line="587" selection-end-line="587" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scraper/scraper.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="325">
+          <caret line="40" column="64" selection-start-line="40" selection-start-column="64" selection-end-line="40" selection-end-column="64" />
+          <folding>
+            <element signature="e#17#255#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sink/opentsdb.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="581">
+          <caret line="61" column="13" selection-start-line="61" selection-start-column="13" selection-end-line="61" selection-end-column="13" />
+          <folding>
+            <element signature="e#14#279#0" expanded="true" />
           </folding>
         </state>
       </provider>

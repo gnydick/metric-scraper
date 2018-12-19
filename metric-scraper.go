@@ -35,7 +35,6 @@ func main() {
     }
 
 
-    DebugLog("Starting up")
     scraperPtr := s.NewScraper(&config)
 
     go func() {

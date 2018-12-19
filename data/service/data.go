@@ -1,9 +1,7 @@
 package service
 
 import (
-    "fmt"
     m "github.com/gnydick/metric-scraper/metric"
-    . "github.com/gnydick/metric-scraper/util"
 )
 
 type ServiceData struct {
@@ -15,17 +13,8 @@ func (s ServiceData) GetMetrics() ([]*m.Metric) {
 }
 
 func (s *ServiceData) RegisterMetric(metric *m.Metric) {
-    for key, _ := range (*metric).Tags {
-        if key == "container" {
-            DebugLog(fmt.Sprintf("BEFORE CHANNEL %s ",metric))
-        }
-    }
+
     s.metrics = append(s.metrics, metric)
-    for key, _ := range (*metric).Tags {
-        if key == "container" {
-            DebugLog(fmt.Sprintf("DURING REGISTER %s ", *metric))
-        }
-    }
 
 }
 
@@ -44,11 +33,9 @@ func (s ServiceData) getTagValue(key string, metric *m.Metric) string {
 
 }
 
-
-
 func NewServiceData() *ServiceData {
     ds := ServiceData{
-        metrics: make([]*m.Metric,0),
+        metrics: make([]*m.Metric, 0),
     }
     return &ds
 }

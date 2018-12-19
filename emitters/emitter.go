@@ -7,5 +7,6 @@ import (
 type Emitter interface {
 	parseLine(timestamp int64, line *string) (*m.Metric)
 	Scan()
+	GetName() string
 }
 

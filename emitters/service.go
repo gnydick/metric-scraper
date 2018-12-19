@@ -45,6 +45,10 @@ func (svc Service) parseLine(timestamp int64, line *string) (*m.Metric) {
     return metric
 }
 
+func (svc Service) GetName() string {
+    return svc.identTag
+}
+
 func (svc Service) Scan() {
     DebugLog("Starting scan")
 

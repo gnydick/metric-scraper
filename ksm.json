@@ -1,12 +1,12 @@
 {
-  "debug": true,
+  "debug": false,
   "kind": "service",
   "disco": "_http._tcp.ksm-kube-state-metrics.default.svc.cluster.local",
   "ident": "ksm",
   "deploymentId": "dev:infra:observ:metric-scraper:default",
-  "interval": "5s",
+  "interval": "60s",
   "orch": "_http._tcp.orch.default.svc.cluster.local",
   "metric": "_telnet._tcp.opentsdb-write.default.svc.cluster.local",
   "sink": "opentsdb",
-  "mode": "development"
+  "mode": "deployed"
 }

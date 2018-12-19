@@ -49,8 +49,13 @@ func (c Cadvisor) parseLine(timestamp int64, line *string) (*m.Metric) {
     return metric
 }
 
+
+func (c Cadvisor) GetName() string {
+    return c.node.Name
+}
+
 func (c Cadvisor) Scan() {
-    DebugLog("Starting scan")
+    DebugLog("Starting scan on %s", c.node.Name)
 
     http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
     resp, err := http.Get(c.url)
@@ -66,7 +71,7 @@ func (c Cadvisor) Scan() {
     newMetric := false
     gotType := false
     sinkChan := c.sink.GetChannel()
-    DebugLog("About to scan file")
+    // DebugLog("About to scan file")
     for scanner.Scan() {
         now := time.Now()
         nanos := now.UnixNano()
@@ -97,21 +102,14 @@ func (c Cadvisor) Scan() {
     for _, container := range *c.ds.GetContainers() {
         conts += 1
         mets := 0
-        DebugLog(fmt.Sprintf("%d Containers", conts))
+        // DebugLog(fmt.Sprintf("%d Containers", conts))
         for _, metric := range *container.GetMetrics() {
             mets += 1
-            DebugLog(fmt.Sprintf("%d metrics", mets))
+            // DebugLog(fmt.Sprintf("%d metrics", mets))
             *sinkChan <- metric
         }
     }
 
-    DebugLog(fmt.Sprintf("%s", c.ds))
-    DebugLog("Releasing Channel")
-    DebugLog(fmt.Sprintf("client count before: %d", c.sink.ClientCount()))
-    DebugLog("ending scan")
 
-    // c.sink.RemoveClient()
-    DebugLog(fmt.Sprintf("client count after: %d", c.sink.ClientCount()))
-    DebugLog("Removed client")
 
 }

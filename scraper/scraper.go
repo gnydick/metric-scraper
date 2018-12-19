@@ -1,9 +1,8 @@
 package scraper
 
 import (
-    "fmt"
-
     c "github.com/gnydick/metric-scraper/config"
+    "github.com/gnydick/metric-scraper/emitters"
     k "github.com/gnydick/metric-scraper/sink"
     t "github.com/gnydick/metric-scraper/targeting"
     . "github.com/gnydick/metric-scraper/util"
@@ -16,6 +15,7 @@ type Scraper struct {
     metricsReported int64
     target          t.Target
     sink            k.Sink
+    emitters        map[string]*emitters.Emitter
 }
 
 var x = 0
@@ -38,6 +38,7 @@ func NewScraper(configPtr *c.Config) (*Scraper) {
             metricsReported: 0,
             target:          target,
             sink:            sink.(k.Sink),
+            emitters:        make(map[string]*emitters.Emitter),
         }
     case "service":
         target := t.NewService(configPtr, "http", sink.(k.Sink))
@@ -46,6 +47,7 @@ func NewScraper(configPtr *c.Config) (*Scraper) {
             metricsReported: 0,
             target:          target,
             sink:            sink.(k.Sink),
+            emitters:        make(map[string]*emitters.Emitter),
         }
     }
 
@@ -60,27 +62,18 @@ func (s Scraper) IncrMetricsReported() {
     s.metricsReported += 1
 }
 
-func (s Scraper) Scrape() {
+func (s *Scraper) Scrape() {
     DebugLog("Starting scrape")
     d, _ := time.ParseDuration(s.config.Interval())
     go s.sink.Send()
     for {
 
-        x += 1
-        DebugLog("go'ing send")
-
         for _, emitter := range (s.target).EmitterPtrs() {
-            DebugLog(fmt.Sprintf("client count before: %d", s.sink.ClientCount()))
-            DebugLog(fmt.Sprintf("client count after: %d", s.sink.ClientCount()))
-            DebugLog("going scan")
+            s.emitters[emitter.GetName()] = &emitter
             go emitter.Scan()
 
         }
 
-        DebugLog("After wait")
-
-
-        DebugLog("Made it to the end of scrape")
         time.Sleep(d)
     }
 }

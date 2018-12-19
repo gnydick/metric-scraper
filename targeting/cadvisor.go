@@ -52,7 +52,6 @@ func (c Cadvisor) getK8sConfig() *rest.Config {
 func (c Cadvisor) EmitterPtrs() ([]e.Emitter) {
     config := c.getK8sConfig()
 
-
     clientset, err := kubernetes.NewForConfig(config)
     if err != nil {
         panic(err.Error())
@@ -63,10 +62,14 @@ func (c Cadvisor) EmitterPtrs() ([]e.Emitter) {
         panic(err.Error())
     }
     emitters := make([]e.Emitter, len(nodes.Items))
+    // emitters := make([]e.Emitter, 1)
     for i, node := range nodes.Items {
         newInst := node // have to create a new instance as 'node' gets destroyed in each loop
+        // if node.Name == "ip-10-90-8-99.us-west-2.compute.internal" {
         emitter := e.NewCadvisor(c.sink, c.configPtr, &newInst)
+        // emitters[0] = emitter
         emitters[i] = emitter
+        // }
     }
     return emitters
 }
