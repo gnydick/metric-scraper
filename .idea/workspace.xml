@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6b5d52f5-8d10-4d20-91e5-b45effda4bb6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.git/hooks/post-receive.sh" beforeDir="false" afterPath="$PROJECT_DIR$/.git/hooks/post-receive.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/emitters/cadvisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/emitters/cadvisor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/targeting/cadvisor.go" beforeDir="false" afterPath="$PROJECT_DIR$/targeting/cadvisor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/emitters/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/emitters/service.go" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -31,9 +27,10 @@
           <entry key="Dockerfile" value="3" />
           <entry key="dockerignore" value="1" />
           <entry key="gitignore" value="1" />
-          <entry key="go" value="289" />
+          <entry key="go" value="291" />
           <entry key="json" value="12" />
           <entry key="s" value="18" />
+          <entry key="sample" value="4" />
           <entry key="sh" value="3" />
           <entry key="txt" value="6" />
           <entry key="yaml" value="3" />
@@ -45,9 +42,9 @@
           <entry key="Docker file" value="1" />
           <entry key="Dockerfile" value="3" />
           <entry key="Git file" value="1" />
-          <entry key="Go" value="289" />
+          <entry key="Go" value="291" />
           <entry key="JSON" value="12" />
-          <entry key="PLAIN_TEXT" value="6" />
+          <entry key="PLAIN_TEXT" value="10" />
           <entry key="YAML" value="3" />
           <entry key="x86 Plan9 Assembly" value="18" />
         </counts>
@@ -56,7 +53,7 @@
         <counts>
           <entry key="Dockerfile" value="179" />
           <entry key="dockerignore" value="45" />
-          <entry key="go" value="13151" />
+          <entry key="go" value="13170" />
           <entry key="json" value="150" />
           <entry key="sh" value="189" />
           <entry key="txt" value="137" />
@@ -68,7 +65,7 @@
           <entry key="Bash" value="189" />
           <entry key="Docker file" value="45" />
           <entry key="Dockerfile" value="179" />
-          <entry key="Go" value="13151" />
+          <entry key="Go" value="13170" />
           <entry key="JSON" value="150" />
           <entry key="PLAIN_TEXT" value="137" />
           <entry key="YAML" value="57" />
@@ -87,11 +84,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.git/hooks/post-receive.sh">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/targeting/cadvisor.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="114">
-              <caret line="6" column="102" selection-start-line="6" selection-start-column="102" selection-end-line="6" selection-end-column="102" />
+            <state relative-caret-position="493">
+              <caret line="52" column="30" lean-forward="true" selection-start-line="52" selection-start-column="30" selection-end-line="52" selection-end-column="30" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/emitters/service.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="513">
+              <caret line="27" column="4" selection-start-line="27" selection-start-column="4" selection-end-line="27" selection-end-column="4" />
+              <folding>
+                <element signature="e#18#398#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -107,8 +116,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>\n</find>
-      <find>fmt.sprint</find>
       <find>addcli</find>
       <find>Sent</find>
       <find>starting up</find>
@@ -137,6 +144,8 @@
       <find>items</find>
       <find>&quot;node&quot;</find>
       <find>:= range</find>
+      <find>mode</find>
+      <find>optionals</find>
     </findStrings>
     <replaceStrings>
       <replace>(ds *DataSet)</replace>
@@ -155,6 +164,7 @@
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$</dir>
+      <dir>$PROJECT_DIR$/</dir>
     </dirStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -181,7 +191,6 @@
         <option value="$PROJECT_DIR$/util/logger.go" />
         <option value="$PROJECT_DIR$/scraper/scraper.go" />
         <option value="$PROJECT_DIR$/data/service/data.go" />
-        <option value="$PROJECT_DIR$/emitters/service.go" />
         <option value="$PROJECT_DIR$/util/multiLevelLogger.go" />
         <option value="$PROJECT_DIR$/helm/metric-scraper/values.yaml" />
         <option value="$PROJECT_DIR$/helm/metric-scraper/templates/nodes.yaml" />
@@ -198,6 +207,7 @@
         <option value="$PROJECT_DIR$/emitters/cadvisor.go" />
         <option value="$PROJECT_DIR$/targeting/cadvisor.go" />
         <option value="$PROJECT_DIR$/.git/hooks/post-receive.sh" />
+        <option value="$PROJECT_DIR$/emitters/service.go" />
       </list>
     </option>
   </component>
@@ -479,17 +489,6 @@
             <path>
               <item name="metric-scraper" type="b2602c69:ProjectViewProjectNode" />
               <item name="metric-scraper" type="462c0819:PsiDirectoryNode" />
-              <item name=".git" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="metric-scraper" type="b2602c69:ProjectViewProjectNode" />
-              <item name="metric-scraper" type="462c0819:PsiDirectoryNode" />
-              <item name=".git" type="462c0819:PsiDirectoryNode" />
-              <item name="hooks" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="metric-scraper" type="b2602c69:ProjectViewProjectNode" />
-              <item name="metric-scraper" type="462c0819:PsiDirectoryNode" />
               <item name="emitters" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -528,15 +527,15 @@
     <property name="settings.editor.selected.configurable" value="preferences.fileTypes" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/data/cadvisor" />
-      <recent name="$PROJECT_DIR$/data" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/helm/metric-scraper" />
       <recent name="$PROJECT_DIR$/helm" />
       <recent name="$PROJECT_DIR$/data/service" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/data/cadvisor" />
+      <recent name="$PROJECT_DIR$/data" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -599,12 +598,12 @@
       <workItem from="1544663089793" duration="32413000" />
       <workItem from="1544820925352" duration="12979000" />
       <workItem from="1545070346531" duration="16987000" />
-      <workItem from="1545175265137" duration="2498000" />
+      <workItem from="1545175265137" duration="5530000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="64877000" />
+    <option name="totallyTimeSpent" value="67909000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="3008" height="1669" extended-state="6" />
@@ -620,12 +619,12 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32995567" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.54595184" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.3303342" />
+      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.3303342" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Amazon EC2" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.29820052" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.29820052" />
       <window_info anchor="bottom" id="Docker" order="9" />
       <window_info anchor="bottom" id="AWS Tail" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
@@ -663,6 +662,12 @@
           <line>89</line>
           <properties />
           <option name="timeStamp" value="175" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/targeting/cadvisor.go</url>
+          <line>34</line>
+          <properties />
+          <option name="timeStamp" value="177" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -754,28 +759,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///usr/local/go/src/net/http/response.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="301">
-          <caret line="32" column="5" selection-start-line="32" selection-start-column="5" selection-end-line="32" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/cadvisor/structs.go" />
-    <entry file="file:///usr/local/go/src/io/io.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="301">
-          <caret line="76" column="7" lean-forward="true" selection-start-line="76" selection-start-column="7" selection-end-line="76" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/go/src/reflect/value.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="423">
-          <caret line="146" selection-start-line="146" selection-end-line="146" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/cadvisor.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="328">
@@ -872,14 +855,14 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/helm/metric-scraper/templates/heapster-deployment.yaml" />
-    <entry file="file://$USER_HOME$/IdeaProjects/helm-source/dev1/metric-scraper/values.yaml">
+    <entry file="file://$USER_HOME$/IdeaProjects/helm-source/dev1/scrapers/charts/metric-scraper/values.yaml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="817">
           <caret line="43" column="12" selection-start-line="43" selection-end-line="43" selection-end-column="12" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/IdeaProjects/helm-source/dev1/metric-scraper/templates/cadvisor-dep.yaml">
+    <entry file="file://$USER_HOME$/IdeaProjects/helm-source/dev1/scrapers/charts/metric-scraper/templates/cadvisor-dep.yaml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
           <caret line="15" column="11" selection-start-line="15" selection-start-column="11" selection-end-line="15" selection-end-column="11" />
@@ -1035,16 +1018,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/emitters/service.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="30" column="49" selection-start-line="30" selection-start-column="47" selection-end-line="30" selection-end-column="49" />
-          <folding>
-            <element signature="e#18#398#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Dockerfile">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="209">
@@ -1066,13 +1039,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="95">
           <caret line="7" column="14" lean-forward="true" selection-start-line="7" selection-start-column="14" selection-end-line="7" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/targeting/cadvisor.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="34" column="27" lean-forward="true" selection-start-line="34" selection-start-column="27" selection-end-line="34" selection-end-column="27" />
         </state>
       </provider>
     </entry>
@@ -1100,10 +1066,47 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.git/hooks/prepare-commit-msg.sample">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="19" column="70" lean-forward="true" selection-start-line="19" selection-start-column="70" selection-end-line="19" selection-end-column="70" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.git/hooks/pre-receive.sample">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.git/hooks/pre-commit.sample">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="11" column="16" lean-forward="true" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.git/hooks/post-update.sample">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/.git/hooks/post-receive.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="114">
           <caret line="6" column="102" selection-start-line="6" selection-start-column="102" selection-end-line="6" selection-end-column="102" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/targeting/cadvisor.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="52" column="30" lean-forward="true" selection-start-line="52" selection-start-column="30" selection-end-line="52" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/emitters/service.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="513">
+          <caret line="27" column="4" selection-start-line="27" selection-start-column="4" selection-end-line="27" selection-end-column="4" />
+          <folding>
+            <element signature="e#18#398#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -3,7 +3,6 @@ package emitters
 import (
     "bufio"
     "crypto/tls"
-    "encoding/json"
     "fmt"
     "io/ioutil"
 
@@ -12,45 +11,26 @@ import (
     "time"
 
     c "github.com/gnydick/metric-scraper/config"
+    dataSvc "github.com/gnydick/metric-scraper/data/service"
     m "github.com/gnydick/metric-scraper/metric"
     k "github.com/gnydick/metric-scraper/sink"
     . "github.com/gnydick/metric-scraper/util"
-    dataSvc "github.com/gnydick/metric-scraper/data/service"
 )
 
 type Service struct {
-    url       string
-    blacklist []string
-    identTag  string
-    sink      k.Sink
+    url         string
+    identTag    string
+    sink        k.Sink
     serviceData dataSvc.ServiceData
 }
 
 func NewService(sink k.Sink, c *c.Config, url string, identTag string) (Service) {
     svcData := dataSvc.NewServiceData()
-    orchUrl := fmt.Sprintf("http://%s/api/rest/v1/config/%s:%s", c.Orch(), c.DeploymentId(), "array:tag_key_blacklist:default")
-    resp, err := http.Get(orchUrl)
-    if err != nil {
-        panic(err)
-    }
-    defer resp.Body.Close()
-    var cfg interface{}
-
-    config := json.RawMessage{}
-    json.NewDecoder(resp.Body).Decode(&config)
-    err = json.Unmarshal(config, &cfg)
-    if err != nil {
-        panic(err)
-    }
-    cfgMap := cfg.(map[string]interface{})
-
-    configText := cfgMap["config"].(string)
 
     emitter := Service{
-        url:       url,
-        blacklist: strings.Split(configText, ","),
-        identTag:  identTag,
-        sink:      sink,
+        url:         url,
+        identTag:    identTag,
+        sink:        sink,
         serviceData: *svcData,
     }
 
