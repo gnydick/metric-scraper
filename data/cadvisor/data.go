@@ -55,6 +55,24 @@ func (ds *DataSet) RegisterMetric(metric *m.Metric) {
                 }
                 container := (*ds).getOrCreateContainer(&containerName)
                 (*ds).fixUpContainer(container, metric)
+            } else {
+                if ds.hasTagKey("id", metric) && ds.getTagValue("id", metric) == "/" {
+                    if ds.hasTagKey("name", metric) && ds.getTagValue("name", metric) == "" {
+                        if ds.hasTagKey("image", metric) && ds.getTagValue("image", metric) == "" {
+                            if ds.hasTagKey("namespace", metric) && ds.getTagValue("namespace", metric) == "" {
+                                if ds.hasTagKey("pod_name", metric) && ds.getTagValue("pod_name", metric) == "" {
+                                    metricName := (*metric).Metric
+                                    re := regexp.MustCompile(`(?P<container>container)_(?P<theRest>.*)`)
+                                    matches := re.FindStringSubmatchIndex(metricName)
+                                    if matches != nil {
+                                        var newMetricNameBytes []byte
+                                        (*metric).Metric = string(re.ExpandString(newMetricNameBytes, "node_${theRest}", metricName, matches))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
         case "pod_name":
@@ -101,11 +119,11 @@ func (ds *DataSet) fixUpContainer(container *Container, metric *m.Metric) {
     }
 
     if (*ds).hasTagKey("container_name", metric) && (*ds).getTagValue("container_name", metric) == "POD" {
-        delete ((*metric).Tags, "container_name")
+        delete((*metric).Tags, "container_name")
     }
 
     if (*ds).hasTagKey("id", metric) {
-        delete ((*metric).Tags, "id")
+        delete((*metric).Tags, "id")
     }
 
 }
@@ -118,7 +136,7 @@ func (ds *DataSet) fixUpPod(pod *Pod, metric *m.Metric) {
     }
 
     if (*ds).hasTagKey("container_name", metric) && (*ds).getTagValue("container_name", metric) == "POD" {
-        delete ((*metric).Tags, "container_name")
+        delete((*metric).Tags, "container_name")
     }
 }
 
