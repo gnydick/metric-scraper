@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="6b5d52f5-8d10-4d20-91e5-b45effda4bb6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/opentsdb.go" beforeDir="false" afterPath="$PROJECT_DIR$/output/opentsdb.go" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -31,6 +30,8 @@
           <entry key="go" value="327" />
           <entry key="json" value="14" />
           <entry key="post-receive" value="3" />
+          <entry key="pre-receive" value="1" />
+          <entry key="prepare-commit-msg" value="1" />
           <entry key="s" value="18" />
           <entry key="sample" value="4" />
           <entry key="sh" value="3" />
@@ -40,7 +41,7 @@
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Bash" value="6" />
+          <entry key="Bash" value="8" />
           <entry key="Docker file" value="1" />
           <entry key="Dockerfile" value="3" />
           <entry key="Git file" value="1" />
@@ -101,15 +102,22 @@
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/output/opentsdb.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="94">
-              <caret line="48" column="19" selection-start-line="48" selection-start-column="19" selection-end-line="48" selection-end-column="19" />
+            <state relative-caret-position="435">
+              <caret line="48" column="14" selection-start-line="48" selection-start-column="14" selection-end-line="48" selection-end-column="14" />
               <folding>
                 <element signature="e#16#130#0" expanded="true" />
               </folding>
             </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.git/hooks/prepare-commit-msg">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-261" />
           </provider>
         </entry>
       </file>
@@ -499,6 +507,17 @@
             <path>
               <item name="metric-scraper" type="b2602c69:ProjectViewProjectNode" />
               <item name="metric-scraper" type="462c0819:PsiDirectoryNode" />
+              <item name=".git" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="metric-scraper" type="b2602c69:ProjectViewProjectNode" />
+              <item name="metric-scraper" type="462c0819:PsiDirectoryNode" />
+              <item name=".git" type="462c0819:PsiDirectoryNode" />
+              <item name="hooks" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="metric-scraper" type="b2602c69:ProjectViewProjectNode" />
+              <item name="metric-scraper" type="462c0819:PsiDirectoryNode" />
               <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -559,7 +578,7 @@
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545253329766" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545254437998" />
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -570,6 +589,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/.git/hooks" />
       <recent name="$PROJECT_DIR$/helm/metric-scraper" />
       <recent name="$PROJECT_DIR$/helm" />
       <recent name="$PROJECT_DIR$/data/service" />
@@ -640,17 +660,18 @@
       <workItem from="1544663089793" duration="32413000" />
       <workItem from="1544820925352" duration="12979000" />
       <workItem from="1545070346531" duration="16987000" />
-      <workItem from="1545175265137" duration="21991000" />
+      <workItem from="1545175265137" duration="22534000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="84370000" />
+    <option name="totallyTimeSpent" value="84913000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="3008" height="1669" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7125604" visible="true" weight="0.16271989" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.7125604" visible="true" weight="0.16271989" />
       <window_info id="Structure" order="1" sideWeight="0.2874396" side_tool="true" weight="0.13464141" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -665,7 +686,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Amazon EC2" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.7821337" />
+      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.562982" />
       <window_info anchor="bottom" id="Docker" order="9" />
       <window_info anchor="bottom" id="AWS Tail" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
@@ -813,20 +834,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///usr/local/go/src/runtime/lock_sema.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="166" selection-start-line="166" selection-end-line="166" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/go/src/runtime/time.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="546">
-          <caret line="96" column="24" lean-forward="true" selection-start-line="96" selection-start-column="24" selection-end-line="96" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/go/src/runtime/netpoll_kqueue.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="197">
@@ -1169,14 +1176,22 @@
     <entry file="file://$PROJECT_DIR$/output/output.go">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/.git/hooks/pre-receive">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/output/opentsdb.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="94">
-          <caret line="48" column="19" selection-start-line="48" selection-start-column="19" selection-end-line="48" selection-end-column="19" />
+        <state relative-caret-position="435">
+          <caret line="48" column="14" selection-start-line="48" selection-start-column="14" selection-end-line="48" selection-end-column="14" />
           <folding>
             <element signature="e#16#130#0" expanded="true" />
           </folding>
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.git/hooks/prepare-commit-msg">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-261" />
       </provider>
     </entry>
   </component>
