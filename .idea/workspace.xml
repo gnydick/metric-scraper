@@ -167,7 +167,7 @@
         <entry file="file://$PROJECT_DIR$/output/opentsdb.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="914">
-              <caret line="49" column="145" selection-start-line="49" selection-start-column="145" selection-end-line="49" selection-end-column="145" />
+              <caret line="49" column="82" selection-start-line="49" selection-start-column="82" selection-end-line="49" selection-end-column="82" />
               <folding>
                 <element signature="e#16#130#0" expanded="true" />
               </folding>
@@ -572,6 +572,17 @@
             <path>
               <item name="metric-scraper" type="b2602c69:ProjectViewProjectNode" />
               <item name="metric-scraper" type="462c0819:PsiDirectoryNode" />
+              <item name=".git" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="metric-scraper" type="b2602c69:ProjectViewProjectNode" />
+              <item name="metric-scraper" type="462c0819:PsiDirectoryNode" />
+              <item name=".git" type="462c0819:PsiDirectoryNode" />
+              <item name="hooks" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="metric-scraper" type="b2602c69:ProjectViewProjectNode" />
+              <item name="metric-scraper" type="462c0819:PsiDirectoryNode" />
               <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -632,7 +643,7 @@
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545249280645" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545249452943" />
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -713,17 +724,17 @@
       <workItem from="1544663089793" duration="32413000" />
       <workItem from="1544820925352" duration="12979000" />
       <workItem from="1545070346531" duration="16987000" />
-      <workItem from="1545175265137" duration="20264000" />
+      <workItem from="1545175265137" duration="20520000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="82643000" />
+    <option name="totallyTimeSpent" value="82899000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="3008" y="0" width="3008" height="1692" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7125604" visible="true" weight="0.08626522" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.7125604" visible="true" weight="0.16271989" />
       <window_info id="Structure" order="1" sideWeight="0.2874396" side_tool="true" weight="0.13464141" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -738,7 +749,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Amazon EC2" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.29765674" />
+      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.29765674" />
       <window_info anchor="bottom" id="Docker" order="9" />
       <window_info anchor="bottom" id="AWS Tail" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
@@ -1082,7 +1093,7 @@
     <entry file="file://$PROJECT_DIR$/.git/hooks/post-update.sample">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/.git/hooks/post-receive.sh">
+    <entry file="file://$PROJECT_DIR$/.git/hooks/post-receive">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="114">
           <caret line="6" column="102" selection-start-line="6" selection-start-column="102" selection-end-line="6" selection-end-column="102" />
@@ -1245,7 +1256,7 @@
     <entry file="file://$PROJECT_DIR$/output/opentsdb.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="914">
-          <caret line="49" column="145" selection-start-line="49" selection-start-column="145" selection-end-line="49" selection-end-column="145" />
+          <caret line="49" column="82" selection-start-line="49" selection-start-column="82" selection-end-line="49" selection-end-column="82" />
           <folding>
             <element signature="e#16#130#0" expanded="true" />
           </folding>
