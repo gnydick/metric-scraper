@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6b5d52f5-8d10-4d20-91e5-b45effda4bb6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/output/opentsdb.go" beforeDir="false" afterPath="$PROJECT_DIR$/output/opentsdb.go" afterDir="false" />
-    </list>
+    <list default="true" id="6b5d52f5-8d10-4d20-91e5-b45effda4bb6" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -148,7 +146,7 @@
         <entry file="file://$PROJECT_DIR$/data/cadvisor/data.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="143">
-              <caret line="73" column="9" lean-forward="true" selection-start-line="73" selection-start-column="9" selection-end-line="73" selection-end-column="9" />
+              <caret line="73" column="9" selection-start-line="73" selection-start-column="9" selection-end-line="73" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -634,7 +632,7 @@
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545248150997" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545248647705" />
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -715,16 +713,15 @@
       <workItem from="1544663089793" duration="32413000" />
       <workItem from="1544820925352" duration="12979000" />
       <workItem from="1545070346531" duration="16987000" />
-      <workItem from="1545175265137" duration="19731000" />
+      <workItem from="1545175265137" duration="20264000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="82110000" />
+    <option name="totallyTimeSpent" value="82643000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="3008" y="0" width="3008" height="1692" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7125604" visible="true" weight="0.08626522" />
       <window_info id="Structure" order="1" sideWeight="0.2874396" side_tool="true" weight="0.13464141" />
@@ -1241,7 +1238,7 @@
     <entry file="file://$PROJECT_DIR$/data/cadvisor/data.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="143">
-          <caret line="73" column="9" lean-forward="true" selection-start-line="73" selection-start-column="9" selection-end-line="73" selection-end-column="9" />
+          <caret line="73" column="9" selection-start-line="73" selection-start-column="9" selection-end-line="73" selection-end-column="9" />
         </state>
       </provider>
     </entry>
