@@ -104,6 +104,10 @@ func (ds *DataSet) fixUpContainer(container *Container, metric *m.Metric) {
         delete ((*metric).Tags, "container_name")
     }
 
+    if (*ds).hasTagKey("id", metric) {
+        delete ((*metric).Tags, "id")
+    }
+
 }
 
 func (ds *DataSet) fixUpPod(pod *Pod, metric *m.Metric) {
