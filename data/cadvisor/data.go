@@ -5,6 +5,11 @@ import (
     "regexp"
 )
 
+type Node struct {
+    name string
+    metrics  map[string]*m.Metric
+}
+
 type Pod struct {
     podName    string
     containers map[string]*Container
@@ -22,15 +27,21 @@ func (c Container) GetMetrics() (*map[string]*m.Metric) {
     return &c.metrics
 }
 
+func (n Node) GetMetrics() (*map[string]*m.Metric) {
+    return &n.metrics
+}
+
 type DataSet struct {
     containers map[string]*Container
     pods       map[string]*Pod
+    nodes      map[string]*Node
 }
 
 func NewDataSet() *DataSet {
     ds := DataSet{
         containers: make(map[string]*Container),
         pods:       make(map[string]*Pod),
+        nodes:      make(map[string]*Node),
     }
     return &ds
 }
@@ -61,12 +72,18 @@ func (ds *DataSet) RegisterMetric(metric *m.Metric) {
                         if ds.hasTagKey("image", metric) && ds.getTagValue("image", metric) == "" {
                             if ds.hasTagKey("namespace", metric) && ds.getTagValue("namespace", metric) == "" {
                                 if ds.hasTagKey("pod_name", metric) && ds.getTagValue("pod_name", metric) == "" {
-                                    metricName := (*metric).Metric
-                                    re := regexp.MustCompile(`(?P<container>container)_(?P<theRest>.*)`)
-                                    matches := re.FindStringSubmatchIndex(metricName)
-                                    if matches != nil {
-                                        var newMetricNameBytes []byte
-                                        (*metric).Metric = string(re.ExpandString(newMetricNameBytes, "node_${theRest}", metricName, matches))
+                                    if ds.hasTagKey("node", metric) && len(ds.getTagValue("node", metric)) > 0 {
+                                        metricName := (*metric).Metric
+                                        re := regexp.MustCompile(`(?P<container>container)_(?P<theRest>.*)`)
+                                        matches := re.FindStringSubmatchIndex(metricName)
+                                        if matches != nil {
+                                            var newMetricNameBytes []byte
+                                            (*metric).Metric = string(re.ExpandString(newMetricNameBytes, "node_${theRest}", metricName, matches))
+                                            nodeName := (*ds).getTagValue("node", metric)
+                                            node := (*ds).getOrCreateNode(&nodeName)
+                                            (*ds).fixUpNode(node, metric)
+                                            (*ds).nodes[nodeName] = node
+                                        }
                                     }
                                 }
                             }
@@ -99,6 +116,17 @@ func (ds *DataSet) getTagValue(key string, metric *m.Metric) string {
     return (*tags)[key]
 
 }
+
+func (ds *DataSet) fixUpNode(node *Node, metric *m.Metric) {
+    delete((*metric).Tags, "id")
+    delete((*metric).Tags, "name")
+    delete((*metric).Tags, "image")
+    delete((*metric).Tags, "namespace")
+    delete((*metric).Tags, "pod_name")
+    delete((*metric).Tags, "container_name")
+    node.metrics[(*metric).Metric] = metric
+}
+
 
 func (ds *DataSet) fixUpContainer(container *Container, metric *m.Metric) {
     container.metrics[metric.Metric] = metric
@@ -189,4 +217,28 @@ func (ds *DataSet) newPod(podName string) *Pod {
 
 func (ds DataSet) GetContainers() *map[string]*Container {
     return &ds.containers
+}
+
+
+func (ds DataSet) GetNodes() *map[string]*Node {
+    return &ds.nodes
+}
+
+func (ds *DataSet) getOrCreateNode(nodeName *string) *Node {
+    for k, v := range (*ds).nodes {
+        if k == *nodeName {
+            return v
+        }
+
+    }
+    newNodePtr := (*ds).newNode(*nodeName)
+    (*ds).nodes[*nodeName] = newNodePtr
+    return newNodePtr
+}
+func (ds *DataSet) newNode(nodeName string) *Node {
+    node := Node{
+        name: nodeName,
+        metrics:  make(map[string]*m.Metric),
+    }
+    return &node
 }

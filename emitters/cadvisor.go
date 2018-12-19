@@ -98,6 +98,19 @@ func (c Cadvisor) Scan() {
         }
 
     }
+
+    var nodes = 0
+    for _, node := range *c.ds.GetNodes() {
+        nodes += 1
+        mets := 0
+        // DebugLog(fmt.Sprintf("%d Containers", nodes))
+        for _, metric := range *node.GetMetrics() {
+            mets += 1
+            // DebugLog(fmt.Sprintf("%d metrics", mets))
+            *sinkChan <- metric
+        }
+    }
+
     conts := 0
     for _, container := range *c.ds.GetContainers() {
         conts += 1
