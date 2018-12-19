@@ -12,7 +12,7 @@ import (
 type Opentsdb struct {
 }
 
-func NewOpentsdbOutput() *Opentsdb {
+func NewOpentsdb() *Opentsdb {
 
     return &Opentsdb{}
 }

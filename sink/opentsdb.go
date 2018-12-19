@@ -44,7 +44,7 @@ func (o *Opentsdb) RemoveClient() {
 }
 
 func (o *Opentsdb) Send() {
-    op := op.NewOpentsdbOutput()
+    op := op.NewOpentsdb()
     conn, err := net.Dial("tcp", o.endpoint)
     if err != nil {
         panic(err)
