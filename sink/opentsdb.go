@@ -57,7 +57,11 @@ func (o *Opentsdb) Send() {
     DebugLog("About to range channel")
 
     for metric := range *(o.receiver) {
-
+        for key, _ := range (*metric).Tags {
+            if key == "container" {
+                DebugLog(fmt.Sprintf("RECEIVED CHANNEL %s ",metric))
+            }
+        }
         metricText := fmt.Sprintf("%s", op.StringMarshal(metric))
         _, _err := fmt.Fprintf(conn, metricText)
         DebugLog(metricText)

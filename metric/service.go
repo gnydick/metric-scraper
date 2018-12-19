@@ -7,10 +7,10 @@ import (
 	"strings"
 )
 
-
+var svcRe = regexp.MustCompile(`(?P<Metric>[a-z0-9_]+){(?P<tags>[a-z=\",-_]+)} (?P<value>[0-9.+-e]+)`)
 type Service struct {}
 
-func (s Service) Unmarshal(millis int64, line *string) Metric {
+func SvcUnmarshal(millis int64, line *string) *Metric {
 	/*
 	match  metric_name{tags} value
 		first field is Metric name
@@ -22,13 +22,13 @@ func (s Service) Unmarshal(millis int64, line *string) Metric {
 	var mnameBytes []byte
 	var tagStringBytes []byte
 	var valueBytes []byte
-	re := regexp.MustCompile(`(?P<Metric>[a-z0-9_]+){(?P<tags>[a-z=\",-_]+)} (?P<value>[0-9.+-e]+)`)
-	matches := re.FindStringSubmatchIndex(*line)
-	if matches != nil {
-		metric.Metric = string(re.ExpandString(mnameBytes, "${Metric}", *line, matches))
-		tagString := string(re.ExpandString(tagStringBytes, "${tags}", *line, matches))
 
-		value, _err := strconv.ParseFloat(string(re.ExpandString(valueBytes, "$value",*line, matches)),64)
+	matches := svcRe.FindStringSubmatchIndex(*line)
+	if matches != nil {
+		metric.Metric = string(svcRe.ExpandString(mnameBytes, "${Metric}", *line, matches))
+		tagString := string(svcRe.ExpandString(tagStringBytes, "${tags}", *line, matches))
+
+		value, _err := strconv.ParseFloat(string(svcRe.ExpandString(valueBytes, "$value",*line, matches)),64)
 		if _err != nil {
 			log.Fatal(_err.Error())
 		}
@@ -46,5 +46,5 @@ func (s Service) Unmarshal(millis int64, line *string) Metric {
 		metric.Tags = mtags
 
 	}
-	return metric
+	return &metric
 }

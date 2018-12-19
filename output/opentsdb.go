@@ -20,6 +20,7 @@ func NewOpentsdbOutput() *Opentsdb {
 func (o *Opentsdb) StringMarshal(metric *m.Metric) string {
     output := fmt.Sprintf("put %s %d %f %s\n", (*metric).Metric,
         (*metric).Time, (*metric).Value, formatTags(metric))
+
     return cleanText(&output)
 }
 
@@ -34,12 +35,13 @@ func (o *Opentsdb) ByteMarshal(metric *m.Metric) []byte {
 }
 
 func formatTags(metric *m.Metric) string {
-    tags := &(*metric).Tags
-    var t = make([]string, len(*tags))
+    tags := (*metric).Tags
+    var t = make([]string, len(tags))
     i := 0
-    for k, v := range *tags {
+    for k, v := range tags {
         t[i] = k + "=" + v
         i++
+
     }
     return strings.Join(t, " ")
 }

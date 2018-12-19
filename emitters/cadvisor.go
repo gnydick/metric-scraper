@@ -100,7 +100,7 @@ func (c Cadvisor) Scan() {
         DebugLog(fmt.Sprintf("%d Containers", conts))
         for _, metric := range *container.GetMetrics() {
             mets += 1
-            DebugLog(fmt.Sprintf("%d Metrics", mets))
+            DebugLog(fmt.Sprintf("%d metrics", mets))
             *sinkChan <- metric
         }
     }

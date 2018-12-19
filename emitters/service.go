@@ -21,7 +21,7 @@ type Service struct {
     url         string
     identTag    string
     sink        k.Sink
-    serviceData dataSvc.ServiceData
+    serviceData *dataSvc.ServiceData
 }
 
 func NewService(sink k.Sink, c *c.Config, url string, identTag string) (Service) {
@@ -31,7 +31,7 @@ func NewService(sink k.Sink, c *c.Config, url string, identTag string) (Service)
         url:         url,
         identTag:    identTag,
         sink:        sink,
-        serviceData: *svcData,
+        serviceData: svcData,
     }
 
     return emitter
@@ -39,9 +39,10 @@ func NewService(sink k.Sink, c *c.Config, url string, identTag string) (Service)
 }
 
 func (svc Service) parseLine(timestamp int64, line *string) (*m.Metric) {
-    serviceMetric := m.Service{}
-    metric := serviceMetric.Unmarshal(timestamp, line)
-    return &metric
+
+    metric := m.SvcUnmarshal(timestamp, line)
+
+    return metric
 }
 
 func (svc Service) Scan() {
@@ -81,17 +82,26 @@ func (svc Service) Scan() {
                 gotType = true
             }
         } else if gotType == true {
-            svc.serviceData.RegisterMetric(svc.parseLine(millis, &line))
-
+            metric := svc.parseLine(millis, &line)
+            svc.serviceData.RegisterMetric(metric)
+            for key, _ := range (*metric).Tags {
+                if key == "container" {
+                    DebugLog(fmt.Sprintf("RIGHT BEFORE SINK %s ", *metric))
+                }
+            }
         }
 
     }
 
     mets := 0
 
-    for _, metric := range *svc.serviceData.GetMetrics() {
+    for _, metric := range svc.serviceData.GetMetrics() {
         mets += 1
-        DebugLog(fmt.Sprintf("%d Metrics", mets))
+        for key, _ := range (*metric).Tags {
+            if key == "container" {
+                DebugLog(fmt.Sprintf("RIGHT BEFORE SINK %s ", *metric))
+            }
+        }
         *sinkChan <- metric
     }
 
