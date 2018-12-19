@@ -3,7 +3,6 @@ package emitters
 import (
     "bufio"
     "crypto/tls"
-    "fmt"
     "io/ioutil"
 
     "net/http"
@@ -88,11 +87,6 @@ func (svc Service) Scan() {
         } else if gotType == true {
             metric := svc.parseLine(millis, &line)
             svc.serviceData.RegisterMetric(metric)
-            for key, _ := range (*metric).Tags {
-                if key == "container" {
-                    DebugLog(fmt.Sprintf("RIGHT BEFORE SINK %s ", *metric))
-                }
-            }
         }
 
     }
@@ -101,21 +95,10 @@ func (svc Service) Scan() {
 
     for _, metric := range svc.serviceData.GetMetrics() {
         mets += 1
-        for key, _ := range (*metric).Tags {
-            if key == "container" {
-                DebugLog(fmt.Sprintf("RIGHT BEFORE SINK %s ", *metric))
-            }
-        }
         *sinkChan <- metric
     }
 
-    DebugLog(fmt.Sprintf("%s", svc.serviceData))
-    DebugLog("Releasing Channel")
-    DebugLog(fmt.Sprintf("client count before: %d", svc.sink.ClientCount()))
-    DebugLog("ending scan")
 
-    // c.sink.RemoveClient()
-    DebugLog(fmt.Sprintf("client count after: %d", svc.sink.ClientCount()))
-    DebugLog("Removed client")
 
+    
 }
