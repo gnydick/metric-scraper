@@ -47,6 +47,6 @@ func formatTags(metric *m.Metric) string {
 }
 
 func cleanText(text *string) (string){
-    return strings.Replace(strings.Replace(strings.Replace(string(*text), `"`, ``, -1), `,`, ` `, -1), `:`, `_`, -1)
+    return strings.Replace(strings.Replace(strings.Replace(strings.Replace(string(*text), `"`, ``, -1), `,`, ` `, -1), `:`, `_`, -1), `@`,`_`, -1)
 }
 
