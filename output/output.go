@@ -6,7 +6,7 @@ import (
 
 type Output interface {
 	StringMarshal(metric m.Metric) (string)
-	ByteMarshal(metric m.Metric) ([]byte)
+	JsonMarshal(metric m.Metric) ([]byte)
 }
 
 

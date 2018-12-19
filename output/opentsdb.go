@@ -24,7 +24,7 @@ func (o *Opentsdb) StringMarshal(metric *m.Metric) string {
     return cleanText(output)
 }
 
-func (o *Opentsdb) ByteMarshal(metric *m.Metric) []byte {
+func (o *Opentsdb) JsonMarshal(metric *m.Metric) []byte {
     output, _err := json.MarshalIndent(metric, "", " ")
     if _err != nil {
         log.Fatal(_err.Error())
