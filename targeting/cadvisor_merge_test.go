@@ -14,6 +14,7 @@ import (
 	"time"
 
 	c "github.com/gnydick/metric-scraper/config"
+	"github.com/gnydick/metric-scraper/util/testsupport"
 )
 
 // stubCadvisor returns a Cadvisor target whose kubeconfig points at apiServerURL. It goes through
@@ -43,18 +44,17 @@ users:
 		t.Fatal(err)
 	}
 
-	configPath := filepath.Join(dir, "config.json")
-	config := fmt.Sprintf(`{
-  "debug": false, "kind": "cadvisor", "disco": "", "ident": "node", "deploymentId": "test",
-  "interval": "5s", "orch": "", "metric": "", "sink": "opentsdb", "mode": "development",
-  "optionals": {"development": {"path": %q}}
-}`, kubeConfigPath)
-	if err := os.WriteFile(configPath, []byte(config), 0o600); err != nil {
+	cfg, err := c.FileBuild(testsupport.WriteConfigFile(t, map[string]interface{}{
+		"optionals": map[string]interface{}{"development": map[string]interface{}{"path": kubeConfigPath}},
+	}))
+	if err != nil {
 		t.Fatal(err)
 	}
-
-	cfg := c.FileBuild(configPath)
-	return NewCadvisor(&cfg, "http", nil)
+	target, err := NewCadvisor(&cfg, "http", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return target
 }
 
 // An API server that never answers the node List must not hold EmitterPtrs past the caller's

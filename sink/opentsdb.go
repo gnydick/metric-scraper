@@ -124,9 +124,17 @@ func getKeys(strings map[string]string) []string {
 
 }
 
-func NewOpentsdbSink(config *c.Config, wg *sync.WaitGroup) *Opentsdb {
+// NewOpentsdbSink looks up where OpenTSDB listens. A lookup that fails or finds nothing is an
+// error for the caller to report at startup, never a panic (#17).
+func NewOpentsdbSink(config *c.Config, wg *sync.WaitGroup) (*Opentsdb, error) {
 
-	_, tsdb, _ := net.LookupSRV("", "", config.Metric())
+	_, tsdb, err := net.LookupSRV("", "", config.Metric())
+	if err != nil {
+		return nil, fmt.Errorf("looking up the OpenTSDB address %q: %w", config.Metric(), err)
+	}
+	if len(tsdb) == 0 {
+		return nil, fmt.Errorf("looking up the OpenTSDB address %q: no SRV record", config.Metric())
+	}
 	tsdbAnswer := tsdb[0]
 	tsdbEndpoint := fmt.Sprintf("%s:%d", tsdbAnswer.Target, tsdbAnswer.Port)
 	sinkChan := make(chan *m.Metric)
@@ -137,5 +145,5 @@ func NewOpentsdbSink(config *c.Config, wg *sync.WaitGroup) *Opentsdb {
 		receiver: &sinkChan,
 	}
 
-	return &sink
+	return &sink, nil
 }
