@@ -12,6 +12,7 @@ import (
 	dataCadv "github.com/gnydick/metric-scraper/data/cadvisor"
 	dataSvc "github.com/gnydick/metric-scraper/data/service"
 	m "github.com/gnydick/metric-scraper/metric"
+	"github.com/gnydick/metric-scraper/util"
 	"github.com/gnydick/metric-scraper/util/testsupport"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -102,6 +103,41 @@ func TestServiceScanSkipsBadLines(t *testing.T) {
 		t.Errorf("sent %v, want %v", sent, want)
 	}
 	assertSkipsLogged(t, logged, "1.2.3", "go_goroutines")
+}
+
+// Each skip is logged by its cause (#19): a line that is not a metric at DEBUG, a metric line with a
+// bad tag at ERROR. The run is at LogLevel DEBUG so both lines are printed.
+func TestScanLogsEachSkipByCause(t *testing.T) {
+	savedLevel := util.LogLevel
+	util.LogLevel = util.DEBUG
+	defer func() { util.LogLevel = savedLevel }()
+
+	body := scanBodyHead +
+		"go_goroutines 12\n" +
+		"things{kind=\"x=y\"} 1\n"
+
+	sent, logged := scanAndCollect(t, body, func(url string, sink *fakeSink) {
+		Service{url: url, identTag: "app=x", sink: sink, serviceData: dataSvc.NewServiceData()}.Scan()
+	})
+
+	if len(sent) != 0 {
+		t.Errorf("sent %v, want nothing: neither line is a good metric", sent)
+	}
+	var debugLine, errorLine string
+	for _, line := range strings.Split(logged, "\n") {
+		if strings.Contains(line, "go_goroutines 12") {
+			debugLine = line
+		}
+		if strings.Contains(line, "x=y") {
+			errorLine = line
+		}
+	}
+	if !strings.Contains(debugLine, "DEBUG") || !strings.HasSuffix(debugLine, "Skipped a line that is not a metric: go_goroutines 12") {
+		t.Errorf("the line that is not a metric was logged as %q, want a DEBUG line naming it: %q", debugLine, logged)
+	}
+	if !strings.Contains(errorLine, "ERROR") || !strings.Contains(errorLine, "Skipped a bad metric line: ") {
+		t.Errorf("the bad tag was logged as %q, want an ERROR line naming it: %q", errorLine, logged)
+	}
 }
 
 // The same for a cadvisor scan. The two good lines are container metrics, which the data set keeps
