@@ -3,33 +3,13 @@ package util
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"strings"
 	"testing"
-)
 
-// captureStdout runs fn and returns what it wrote to os.Stdout. Unknwon/log prints with fmt.Printf,
-// so stdout is the path the user's log output takes.
-func captureStdout(t *testing.T, fn func()) string {
-	t.Helper()
-	r, w, err := os.Pipe()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	saved := os.Stdout
-	os.Stdout = w
-	defer func() { os.Stdout = saved }()
-	fn()
-	w.Close()
-	out, err := io.ReadAll(r)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return string(out)
-}
+	"github.com/gnydick/metric-scraper/util/testsupport"
+)
 
 // Each logger forwards its args to the format string. The expected text comes from the format and
 // the argument, not from a run: "count=%d" with 5 is "count=5".
@@ -50,7 +30,7 @@ func TestLogFuncsForwardFormatArgs(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			LogLevel = tc.level
-			out := captureStdout(t, func() { tc.log("count=%d", 5) })
+			out := testsupport.CaptureStdout(t, func() { tc.log("count=%d", 5) })
 			// The observer is alive only if the line was printed at all.
 			if out == "" {
 				t.Fatalf("%s printed nothing at LogLevel %d", tc.name, tc.level)
@@ -83,7 +63,7 @@ func TestLogFuncsPrintAtOrAboveLogLevel(t *testing.T) {
 			want := lg.level >= logLevel
 			t.Run(fmt.Sprintf("LogLevel=%d/%s", logLevel, lg.name), func(t *testing.T) {
 				LogLevel = logLevel
-				out := captureStdout(t, func() { lg.log("marker") })
+				out := testsupport.CaptureStdout(t, func() { lg.log("marker") })
 				got := strings.Contains(out, "marker\n")
 				if got != want {
 					t.Errorf("%s at LogLevel %d: printed=%v, want %v (output %q)", lg.name, logLevel, got, want, out)
