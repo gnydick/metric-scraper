@@ -7,7 +7,7 @@ import (
 )
 
 type Target interface {
-	EmitterPtrs() ([]e.Emitter)
+	EmitterPtrs() []e.Emitter
 	GetConfig() (config *c.Config)
 }
 

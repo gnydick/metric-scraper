@@ -4,14 +4,11 @@ import (
 	m "github.com/gnydick/metric-scraper/metric"
 )
 
-
 type Sink interface {
 	Send()
-    AddClient()
+	AddClient()
 	Wait()
 	RemoveClient()
-	GetChannel() (*chan *m.Metric)
+	GetChannel() *chan *m.Metric
 	ClientCount() int
 }
-
-

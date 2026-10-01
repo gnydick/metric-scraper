@@ -1,12 +1,12 @@
 package output
 
 import (
-    "encoding/json"
-    "fmt"
-    "log"
-    "strings"
+	"encoding/json"
+	"fmt"
+	"log"
+	"strings"
 
-    m "github.com/gnydick/metric-scraper/metric"
+	m "github.com/gnydick/metric-scraper/metric"
 )
 
 type Opentsdb struct {
@@ -14,39 +14,38 @@ type Opentsdb struct {
 
 func NewOpentsdb() *Opentsdb {
 
-    return &Opentsdb{}
+	return &Opentsdb{}
 }
 
 func (o *Opentsdb) StringMarshal(metric *m.Metric) string {
-    output := fmt.Sprintf("put %s %d %f %s\n", (*metric).Metric,
-        (*metric).Time, (*metric).Value, formatTags(metric))
+	output := fmt.Sprintf("put %s %d %f %s\n", (*metric).Metric,
+		(*metric).Time, (*metric).Value, formatTags(metric))
 
-    return cleanText(output)
+	return cleanText(output)
 }
 
 func (o *Opentsdb) JsonMarshal(metric *m.Metric) []byte {
-    output, _err := json.MarshalIndent(metric, "", " ")
-    if _err != nil {
-        log.Fatal(_err.Error())
-    }
+	output, _err := json.MarshalIndent(metric, "", " ")
+	if _err != nil {
+		log.Fatal(_err.Error())
+	}
 
-    text := string(output)
-    return []byte(cleanText(text))
+	text := string(output)
+	return []byte(cleanText(text))
 }
 
 func formatTags(metric *m.Metric) string {
-    tags := (*metric).Tags
-    var t = make([]string, len(tags))
-    i := 0
-    for k, v := range tags {
-        t[i] = k + "=" + v
-        i++
+	tags := (*metric).Tags
+	var t = make([]string, len(tags))
+	i := 0
+	for k, v := range tags {
+		t[i] = k + "=" + v
+		i++
 
-    }
-    return strings.Join(t, " ")
+	}
+	return strings.Join(t, " ")
 }
 
-func cleanText(output string) (string){
-    return strings.Replace(strings.Replace(strings.Replace(strings.Replace(string(output), `"`, ``, -1), `,`, ` `, -1), `:`, `_`, -1), `@`,`_`, -1)
+func cleanText(output string) string {
+	return strings.Replace(strings.Replace(strings.Replace(strings.Replace(string(output), `"`, ``, -1), `,`, ` `, -1), `:`, `_`, -1), `@`, `_`, -1)
 }
-

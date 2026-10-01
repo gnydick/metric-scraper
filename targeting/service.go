@@ -15,11 +15,11 @@ type Service struct {
 	sink   k.Sink
 }
 
-func NewService(config *c.Config, scheme string, sink k.Sink) (Service) {
+func NewService(config *c.Config, scheme string, sink k.Sink) Service {
 	service := Service{
 		config: config,
 		scheme: scheme,
-		sink: sink,
+		sink:   sink,
 	}
 	return service
 }
@@ -28,7 +28,7 @@ func (s Service) GetConfig() (config *c.Config) {
 	return
 }
 
-func (s Service) EmitterPtrs() ([]e.Emitter) {
+func (s Service) EmitterPtrs() []e.Emitter {
 	emitters := make([]e.Emitter, 1)
 
 	emitters[0] = e.NewService(s.sink, s.config, s.assembleServiceEndpoint(), "app="+s.config.Ident())
