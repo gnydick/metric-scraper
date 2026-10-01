@@ -37,11 +37,8 @@ func NewService(sink k.Sink, c *c.Config, url string, identTag string) Service {
 
 }
 
-func (svc Service) parseLine(timestamp int64, line *string) *m.Metric {
-
-	metric := m.SvcUnmarshal(timestamp, line)
-
-	return metric
+func (svc Service) parseLine(timestamp int64, line string) (*m.Metric, error) {
+	return m.SvcUnmarshal(timestamp, line)
 }
 
 func (svc Service) GetName() string {
@@ -85,7 +82,11 @@ func (svc Service) Scan() {
 				gotType = true
 			}
 		} else if gotType == true {
-			metric := svc.parseLine(millis, &line)
+			metric, err := svc.parseLine(millis, line)
+			if err != nil {
+				logSkipped(line, err)
+				continue
+			}
 			svc.serviceData.RegisterMetric(metric)
 		}
 
