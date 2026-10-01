@@ -63,42 +63,41 @@ func (ds *DataSet) RegisterMetric(metric *m.Metric) {
 		}
 
 	} else {
-		for k, v := range *tags {
-			switch key := k; key {
-			case "container_name":
-				containerName := v
-				if len(containerName) > 0 {
-					switch cName := containerName; cName {
-					case "POD":
-						metricName := (*metric).Metric
-						re := regexp.MustCompile(`(?P<container>container)_(?P<theRest>.*)`)
-						matches := re.FindStringSubmatchIndex(metricName)
-						if matches != nil {
-							var newMetricNameBytes []byte
-							(*metric).Metric = string(re.ExpandString(newMetricNameBytes, "pod_${theRest}", metricName, matches))
-						}
-
+		// The rules read the tags they need by key, container_name before pod_name. Walking the map
+		// visits them in a random order, and fixUpPod removes container_name from a POD line, so the
+		// line was lost whenever pod_name came first (#47).
+		if containerName, ok := (*tags)["container_name"]; ok {
+			if len(containerName) > 0 {
+				switch cName := containerName; cName {
+				case "POD":
+					metricName := (*metric).Metric
+					re := regexp.MustCompile(`(?P<container>container)_(?P<theRest>.*)`)
+					matches := re.FindStringSubmatchIndex(metricName)
+					if matches != nil {
+						var newMetricNameBytes []byte
+						(*metric).Metric = string(re.ExpandString(newMetricNameBytes, "pod_${theRest}", metricName, matches))
 					}
-					container := (*ds).getOrCreateContainer(&containerName)
-					(*ds).fixUpContainer(container, metric)
-				} else {
-					if ds.hasTagKey("id", metric) && ds.getTagValue("id", metric) == "/" {
-						if ds.hasTagKey("name", metric) && ds.getTagValue("name", metric) == "" {
-							if ds.hasTagKey("image", metric) && ds.getTagValue("image", metric) == "" {
-								if ds.hasTagKey("namespace", metric) && ds.getTagValue("namespace", metric) == "" {
-									if ds.hasTagKey("pod_name", metric) && ds.getTagValue("pod_name", metric) == "" {
-										if ds.hasTagKey("node", metric) && len(ds.getTagValue("node", metric)) > 0 {
-											metricName := (*metric).Metric
-											re := regexp.MustCompile(`(?P<container>container)_(?P<theRest>.*)`)
-											matches := re.FindStringSubmatchIndex(metricName)
-											if matches != nil {
-												var newMetricNameBytes []byte
-												(*metric).Metric = string(re.ExpandString(newMetricNameBytes, "node_${theRest}", metricName, matches))
-												nodeName := (*ds).node.Name
-												node := (*ds).getOrCreateNode((*ds).node.Name)
-												(*ds).fixUpNode(node, metric)
-												(*ds).nodes[nodeName] = node
-											}
+
+				}
+				container := (*ds).getOrCreateContainer(&containerName)
+				(*ds).fixUpContainer(container, metric)
+			} else {
+				if ds.hasTagKey("id", metric) && ds.getTagValue("id", metric) == "/" {
+					if ds.hasTagKey("name", metric) && ds.getTagValue("name", metric) == "" {
+						if ds.hasTagKey("image", metric) && ds.getTagValue("image", metric) == "" {
+							if ds.hasTagKey("namespace", metric) && ds.getTagValue("namespace", metric) == "" {
+								if ds.hasTagKey("pod_name", metric) && ds.getTagValue("pod_name", metric) == "" {
+									if ds.hasTagKey("node", metric) && len(ds.getTagValue("node", metric)) > 0 {
+										metricName := (*metric).Metric
+										re := regexp.MustCompile(`(?P<container>container)_(?P<theRest>.*)`)
+										matches := re.FindStringSubmatchIndex(metricName)
+										if matches != nil {
+											var newMetricNameBytes []byte
+											(*metric).Metric = string(re.ExpandString(newMetricNameBytes, "node_${theRest}", metricName, matches))
+											nodeName := (*ds).node.Name
+											node := (*ds).getOrCreateNode((*ds).node.Name)
+											(*ds).fixUpNode(node, metric)
+											(*ds).nodes[nodeName] = node
 										}
 									}
 								}
@@ -106,14 +105,12 @@ func (ds *DataSet) RegisterMetric(metric *m.Metric) {
 						}
 					}
 				}
-
-			case "pod_name":
-				podName := v
-				if len(podName) > 0 {
-					pod := (*ds).getOrCreatePod(&podName)
-					(*ds).fixUpPod(pod, metric)
-				}
 			}
+		}
+
+		if podName, ok := (*tags)["pod_name"]; ok && len(podName) > 0 {
+			pod := (*ds).getOrCreatePod(&podName)
+			(*ds).fixUpPod(pod, metric)
 		}
 	}
 }

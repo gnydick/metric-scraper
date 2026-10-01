@@ -43,6 +43,31 @@ func nodeMetricNames(ds *DataSet) string {
 	return strings.Join(names, " ")
 }
 
+// A line for a pod's own POD container is always kept and renamed pod_<rest>, however Go happens
+// to order the tags (#47). Go orders a map differently from run to run, so the same line is
+// registered many times; before the fix it was kept only 73 to 76 times out of 200.
+func TestRegisterAlwaysKeepsAPodContainerLine(t *testing.T) {
+	const tries = 200
+	kept := 0
+	for i := 0; i < tries; i++ {
+		ds := newTestDataSet()
+		ds.RegisterMetric(&m.Metric{Metric: "container_cpu_usage", Value: 1, Tags: map[string]string{
+			"container_name": "POD", "id": "/kubepods/pod1/abc", "name": "k8s_POD_p", "image": "pause",
+			"namespace": "default", "pod_name": "p", "node": nodeName,
+		}})
+		container, ok := (*ds.GetContainers())["POD"]
+		if !ok {
+			continue
+		}
+		if _, ok := (*container.GetMetrics())["pod_cpu_usage"]; ok {
+			kept++
+		}
+	}
+	if kept != tries {
+		t.Errorf("kept the POD line, renamed pod_cpu_usage, %d times out of %d; want every time", kept, tries)
+	}
+}
+
 // A machine metric is filed under its node even when it is the first line seen (#23).
 func TestRegisterMachineMetricOnAFreshDataSet(t *testing.T) {
 	for _, name := range []string{"machine_cpu_cores", "machine_memory_bytes"} {
