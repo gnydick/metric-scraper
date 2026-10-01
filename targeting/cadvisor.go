@@ -51,7 +51,9 @@ func (c Cadvisor) getK8sConfig() *rest.Config {
 
 }
 
-func (c Cadvisor) EmitterPtrs() []e.Emitter {
+// EmitterPtrs lists the nodes and returns one emitter per node. The node List ends when ctx does,
+// and a failed List is returned to the caller, never panicked (#7).
+func (c Cadvisor) EmitterPtrs(ctx context.Context) ([]e.Emitter, error) {
 	config := c.getK8sConfig()
 
 	clientset, err := kubernetes.NewForConfig(config)
@@ -59,10 +61,9 @@ func (c Cadvisor) EmitterPtrs() []e.Emitter {
 		panic(err.Error())
 	}
 
-	// No deadline, as before client-go took a context (#4). A hung List stalls the scrape loop.
-	nodes, err := clientset.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{})
+	nodes, err := clientset.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 	emitters := make([]e.Emitter, len(nodes.Items))
 	// emitters := make([]e.Emitter, 1)
@@ -74,5 +75,5 @@ func (c Cadvisor) EmitterPtrs() []e.Emitter {
 		emitters[i] = emitter
 		// }
 	}
-	return emitters
+	return emitters, nil
 }

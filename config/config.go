@@ -140,6 +140,7 @@ func FileBuild(configFile string) Config {
 	if _err != nil {
 		log.Fatal(_err.Error())
 	}
+	defer file.Close()
 	decoder := json.NewDecoder(file)
 	_err = decoder.Decode(&data)
 	if _err != nil {
