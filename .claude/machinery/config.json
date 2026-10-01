@@ -22,5 +22,6 @@
   },
   "checks": {
     "commit": "node -e \"const o=require('child_process').execSync('gofmt -l .').toString();if(o.trim()){process.stdout.write(o);process.exit(1)}\""
-  }
+  },
+  "comparisonAgent": "we have no comparisons"
 }
