@@ -27,7 +27,7 @@ func DebugLog(thing string, args ...interface{}) {
 }
 
 func InfoLog(thing string, args ...interface{}) {
-	if LogLevel >= INFO {
+	if LogLevel <= INFO {
 		if len(args) > 0 {
 			log.Info(thing, args...)
 		} else {
@@ -37,7 +37,7 @@ func InfoLog(thing string, args ...interface{}) {
 }
 
 func WarningLog(thing string, args ...interface{}) {
-	if LogLevel >= WARNING {
+	if LogLevel <= WARNING {
 		if len(args) > 0 {
 			log.Warn(thing, args...)
 		} else {
@@ -47,7 +47,7 @@ func WarningLog(thing string, args ...interface{}) {
 }
 
 func ErrorLog(thing string, args ...interface{}) {
-	if LogLevel >= ERROR {
+	if LogLevel <= ERROR {
 		if len(args) > 0 {
 			log.Error(thing, args...)
 		} else {
@@ -56,12 +56,11 @@ func ErrorLog(thing string, args ...interface{}) {
 	}
 }
 
+// FatalLog logs and exits at every LogLevel: log.Fatal ends the process.
 func FatalLog(thing string, args ...interface{}) {
-	if LogLevel >= FATAL {
-		if len(args) > 0 {
-			log.Fatal(thing, args...)
-		} else {
-			log.Fatal(thing)
-		}
+	if len(args) > 0 {
+		log.Fatal(thing, args...)
+	} else {
+		log.Fatal(thing)
 	}
 }
