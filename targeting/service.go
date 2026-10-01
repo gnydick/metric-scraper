@@ -1,6 +1,7 @@
 package targeting
 
 import (
+	"context"
 	"fmt"
 	"net"
 
@@ -28,11 +29,11 @@ func (s Service) GetConfig() (config *c.Config) {
 	return
 }
 
-func (s Service) EmitterPtrs() []e.Emitter {
+func (s Service) EmitterPtrs(ctx context.Context) ([]e.Emitter, error) {
 	emitters := make([]e.Emitter, 1)
 
 	emitters[0] = e.NewService(s.sink, s.config, s.assembleServiceEndpoint(), "app="+s.config.Ident())
-	return emitters
+	return emitters, nil
 }
 
 func (s Service) assembleServiceEndpoint() (url string) {

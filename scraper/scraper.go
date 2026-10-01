@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"context"
 	c "github.com/gnydick/metric-scraper/config"
 	"github.com/gnydick/metric-scraper/emitters"
 	k "github.com/gnydick/metric-scraper/sink"
@@ -16,6 +17,7 @@ type Scraper struct {
 	target          t.Target
 	sink            k.Sink
 	emitters        map[string]*emitters.Emitter
+	progress        *Progress
 }
 
 var x = 0
@@ -51,6 +53,9 @@ func NewScraper(configPtr *c.Config) *Scraper {
 		}
 	}
 
+	interval, _ := time.ParseDuration(configPtr.Interval())
+	scraper.progress = NewProgress(time.Now(), interval)
+
 	return &scraper
 }
 
@@ -67,13 +72,30 @@ func (s *Scraper) Scrape() {
 	d, _ := time.ParseDuration(s.config.Interval())
 	go s.sink.Send()
 	for {
-
-		for _, emitter := range (s.target).EmitterPtrs() {
-			s.emitters[emitter.GetName()] = &emitter
-			go emitter.Scan()
-
-		}
-
+		s.scrapeRound(d)
 		time.Sleep(d)
+	}
+}
+
+// Healthy reports whether target discovery succeeded within the last two scrape intervals.
+func (s *Scraper) Healthy(now time.Time) bool {
+	return s.progress.Healthy(now)
+}
+
+// scrapeRound discovers the targets and starts a scan of each. Discovery gets one interval; if it
+// fails or runs out of time the round is skipped and the next interval tries again.
+func (s *Scraper) scrapeRound(interval time.Duration) {
+	ctx, cancel := context.WithTimeout(context.Background(), interval)
+	found, err := s.target.EmitterPtrs(ctx)
+	cancel()
+	if err != nil {
+		ErrorLog("Target discovery failed, skipping this round: %s", err.Error())
+		return
+	}
+	s.progress.MarkSuccess(time.Now())
+
+	for _, emitter := range found {
+		s.emitters[emitter.GetName()] = &emitter
+		go emitter.Scan()
 	}
 }

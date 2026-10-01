@@ -25,7 +25,6 @@ func init() {
 func main() {
 
 	router := mux.NewRouter()
-	router.HandleFunc("/healthz", GetHealthz).Methods("GET")
 
 	configPath := os.Getenv("CONFIG_PATH")
 
@@ -35,6 +34,9 @@ func main() {
 	}
 
 	scraperPtr := s.NewScraper(&config)
+	router.HandleFunc("/healthz", healthzHandler(func() bool {
+		return scraperPtr.Healthy(time.Now())
+	})).Methods("GET")
 
 	go func() {
 		_err := http.ListenAndServe(":8765", router)
@@ -50,10 +52,16 @@ func uptime() time.Duration {
 	return time.Since(startTime)
 }
 
-func GetHealthz(w http.ResponseWriter, r *http.Request) {
-	health := make(map[string]string)
-	health["uptime"] = strconv.FormatFloat(uptime().Seconds(), 10, 1, 64)
-	health["hostname"], _ = os.Hostname()
-	health["metrics_reported"] = strconv.FormatInt(0.0, 10)
-	json.NewEncoder(w).Encode(health)
+// healthzHandler answers 200 while healthy() holds and 503 otherwise, with the same JSON report.
+func healthzHandler(healthy func() bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		health := make(map[string]string)
+		health["uptime"] = strconv.FormatFloat(uptime().Seconds(), 10, 1, 64)
+		health["hostname"], _ = os.Hostname()
+		health["metrics_reported"] = strconv.FormatInt(0.0, 10)
+		if !healthy() {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+		json.NewEncoder(w).Encode(health)
+	}
 }
