@@ -42,12 +42,14 @@ func TestProgressHealthyWithinTwoIntervals(t *testing.T) {
 type fakeTarget struct {
 	discover func(ctx context.Context) ([]emitters.Emitter, error)
 	calls    int
+	calledAt time.Time
 	deadline time.Time
 	hadLimit bool
 }
 
 func (f *fakeTarget) EmitterPtrs(ctx context.Context) ([]emitters.Emitter, error) {
 	f.calls++
+	f.calledAt = time.Now()
 	f.deadline, f.hadLimit = ctx.Deadline()
 	return f.discover(ctx)
 }
@@ -92,9 +94,12 @@ func TestScrapeRoundEndsWhenDiscoveryHangs(t *testing.T) {
 	if !target.hadLimit {
 		t.Fatal("discovery got a context with no deadline")
 	}
-	// The deadline is one interval after the round began, so it lies in (start, now].
-	if !target.deadline.After(start) || target.deadline.After(time.Now()) {
-		t.Errorf("discovery deadline %v is outside the round (%v, %v]", target.deadline, start, time.Now())
+	// The deadline is one interval after the context was made. That moment lies between the start
+	// of the test and the call into discovery, so the deadline lies one interval after each.
+	earliest, latest := start.Add(interval), target.calledAt.Add(interval)
+	if target.deadline.Before(earliest) || target.deadline.After(latest) {
+		t.Errorf("discovery deadline %v is not one interval (%v) into the round: want within [%v, %v]",
+			target.deadline, interval, earliest, latest)
 	}
 	if s.progress.Healthy(start.Add(2*interval + time.Nanosecond)) {
 		t.Error("a round whose discovery timed out was counted as progress")
