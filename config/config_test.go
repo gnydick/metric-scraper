@@ -84,9 +84,13 @@ func TestFileBuildRefusesABadConfig(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			path := testsupport.WriteConfigFile(t, tc.changes)
-			_, err := FileBuild(path)
+			cfg, err := FileBuild(path)
 			if err == nil {
 				t.Fatal("FileBuild err = nil, want a validation error")
+			}
+			// No usable config comes back: every field is at its zero value.
+			if cfg.Kind() != "" || cfg.Sink() != "" || cfg.Mode() != "" || cfg.Interval() != 0 {
+				t.Errorf("FileBuild returned a filled config %+v alongside the error", cfg)
 			}
 			if !strings.Contains(err.Error(), `"`+tc.field+`"`) {
 				t.Errorf("error %q does not name the field %q", err, tc.field)
@@ -106,7 +110,12 @@ func TestFileBuildRefusesAnUnreadableFile(t *testing.T) {
 	if err := os.WriteFile(notJSON, []byte("{not json"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	for _, path := range []string{missing, notJSON} {
+	// Valid JSON, but a list where the config object should be.
+	notAnObject := filepath.Join(dir, "list.json")
+	if err := os.WriteFile(notAnObject, []byte(`["cadvisor"]`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	for _, path := range []string{missing, notJSON, notAnObject} {
 		_, err := FileBuild(path)
 		if err == nil {
 			t.Errorf("FileBuild(%s) err = nil, want an error", path)

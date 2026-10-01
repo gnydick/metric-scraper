@@ -31,8 +31,9 @@ const (
 	ModeDevelopment Mode = "development"
 )
 
-// Config is a validated configuration. FileBuild is the one way to get a usable one: the fields
-// are private, so a Config that code holds has a known kind, sink and mode and a positive interval.
+// Config is a validated configuration. The fields are private and FileBuild is the one way to fill
+// them, so a Config from FileBuild has a known kind, sink and mode and a positive interval. The
+// zero Config has none of them; NewScraper refuses it.
 type Config struct {
 	debug        bool
 	kind         Kind

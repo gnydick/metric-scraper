@@ -2,6 +2,7 @@ package targeting
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 
 	c "github.com/gnydick/metric-scraper/config"
@@ -19,8 +20,17 @@ func TestNewCadvisorRefusesAKubeconfigThatCannotBeLoaded(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// The helper's config runs in development mode, the mode that reads a kubeconfig file.
+	if cfg.Mode() != c.ModeDevelopment {
+		t.Fatalf("test config has mode %q, want development", cfg.Mode())
+	}
+
 	_, err = NewCadvisor(&cfg, "http", nil)
 	if err == nil {
 		t.Fatal("NewCadvisor err = nil for a kubeconfig file that does not exist, want an error")
+	}
+	// The error is about that file, not about something else.
+	if !strings.Contains(err.Error(), missing) {
+		t.Errorf("error %q does not name the kubeconfig file %s", err, missing)
 	}
 }
