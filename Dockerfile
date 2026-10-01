@@ -10,5 +10,6 @@ RUN CGO_ENABLED=0 go build -o /out/metric-scraper .
 FROM gcr.io/distroless/static:nonroot
 
 COPY --from=build /out/metric-scraper /metric-scraper
-USER nonroot
+# The nonroot user by number: a pod with runAsNonRoot can only verify a numeric user.
+USER 65532:65532
 CMD [ "/metric-scraper" ]
