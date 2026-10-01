@@ -1,6 +1,7 @@
 {
   "worktree": "always",
   "tiers": {
-    "assignment": "propose-per-commit"
+    "assignment": "propose-per-commit",
+    "declaration": "build tag: no tag = fast; //go:build merge = merge; //go:build heavy = heavy"
   }
 }
