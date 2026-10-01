@@ -1,3 +1,6 @@
 {
-  "worktree": "always"
+  "worktree": "always",
+  "tiers": {
+    "assignment": "propose-per-commit"
+  }
 }
