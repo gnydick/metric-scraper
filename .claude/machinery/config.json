@@ -3,7 +3,9 @@
   "tiers": {
     "assignment": "propose-per-commit",
     "declaration": "build tag: no tag = fast; //go:build merge = merge; //go:build heavy = heavy",
-    "fast": "go vet <components> && go test <components>"
+    "fast": "go vet <components> && go test <components>",
+    "merge": "go vet -tags merge ./... && go test -tags merge ./...",
+    "heavy": "go test -tags heavy ./..."
   },
   "components": {
     ".": "metric-scraper.go",
