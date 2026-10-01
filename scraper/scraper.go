@@ -2,6 +2,7 @@ package scraper
 
 import (
 	"context"
+	"fmt"
 	c "github.com/gnydick/metric-scraper/config"
 	"github.com/gnydick/metric-scraper/emitters"
 	k "github.com/gnydick/metric-scraper/sink"
@@ -22,41 +23,45 @@ type Scraper struct {
 
 var x = 0
 
-func NewScraper(configPtr *c.Config) *Scraper {
-	var scraper Scraper
-
-	var sink interface{}
-	switch sinkKind := configPtr.Sink(); sinkKind {
-	case "opentsdb":
-		var otsdb = k.NewOpentsdbSink(configPtr, &sync.WaitGroup{})
+// NewScraper builds the sink and the target the config names. A sink or target that cannot be set
+// up is an error for the caller to report at startup, never a panic (#17).
+func NewScraper(configPtr *c.Config) (*Scraper, error) {
+	var sink k.Sink
+	switch configPtr.Sink() {
+	case c.SinkOpentsdb:
+		otsdb, err := k.NewOpentsdbSink(configPtr, &sync.WaitGroup{})
+		if err != nil {
+			return nil, err
+		}
 		sink = otsdb
+	default:
+		// A validated Config holds no other sink; this arm is for a sink kind added to the config
+		// package and not yet built here.
+		return nil, fmt.Errorf("no sink is built for sink kind %q", configPtr.Sink())
 	}
 
-	switch kind := configPtr.Kind(); kind {
-	case "cadvisor":
-		target := t.NewCadvisor(configPtr, "http", sink.(k.Sink))
-		scraper = Scraper{
-			config:          configPtr,
-			metricsReported: 0,
-			target:          target,
-			sink:            sink.(k.Sink),
-			emitters:        make(map[string]*emitters.Emitter),
+	var target t.Target
+	switch configPtr.Kind() {
+	case c.KindCadvisor:
+		cadvisor, err := t.NewCadvisor(configPtr, "http", sink)
+		if err != nil {
+			return nil, err
 		}
-	case "service":
-		target := t.NewService(configPtr, "http", sink.(k.Sink))
-		scraper = Scraper{
-			config:          configPtr,
-			metricsReported: 0,
-			target:          target,
-			sink:            sink.(k.Sink),
-			emitters:        make(map[string]*emitters.Emitter),
-		}
+		target = cadvisor
+	case c.KindService:
+		target = t.NewService(configPtr, "http", sink)
+	default:
+		return nil, fmt.Errorf("no target is built for kind %q", configPtr.Kind())
 	}
 
-	interval, _ := time.ParseDuration(configPtr.Interval())
-	scraper.progress = NewProgress(time.Now(), interval)
-
-	return &scraper
+	return &Scraper{
+		config:          configPtr,
+		metricsReported: 0,
+		target:          target,
+		sink:            sink,
+		emitters:        make(map[string]*emitters.Emitter),
+		progress:        NewProgress(time.Now(), configPtr.Interval()),
+	}, nil
 }
 
 func (s Scraper) MetricsReported() int64 {
@@ -69,7 +74,7 @@ func (s Scraper) IncrMetricsReported() {
 
 func (s *Scraper) Scrape() {
 	DebugLog("Starting scrape")
-	d, _ := time.ParseDuration(s.config.Interval())
+	d := s.config.Interval()
 	go s.sink.Send()
 	for {
 		s.scrapeRound(d)

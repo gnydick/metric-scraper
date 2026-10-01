@@ -26,14 +26,11 @@ func main() {
 
 	router := mux.NewRouter()
 
-	configPath := os.Getenv("CONFIG_PATH")
-
-	config := c.FileBuild(configPath)
-	if config.Debug() {
-		LogLevel = DEBUG
+	scraperPtr, err := startup(os.Getenv("CONFIG_PATH"))
+	if err != nil {
+		// A reported failure, not a crash (docs/dictated-specs/config.md, Bad config at startup).
+		log.Fatal("Startup failed: %s", err.Error())
 	}
-
-	scraperPtr := s.NewScraper(&config)
 	router.HandleFunc("/healthz", healthzHandler(func() bool {
 		return scraperPtr.Healthy(time.Now())
 	})).Methods("GET")
@@ -46,6 +43,19 @@ func main() {
 	}()
 
 	scraperPtr.Scrape()
+}
+
+// startup loads and validates the config and builds the scraper from it. A bad config, or a sink
+// or target that cannot be set up, comes back as an error.
+func startup(configPath string) (*s.Scraper, error) {
+	config, err := c.FileBuild(configPath)
+	if err != nil {
+		return nil, err
+	}
+	if config.Debug() {
+		LogLevel = DEBUG
+	}
+	return s.NewScraper(&config)
 }
 
 func uptime() time.Duration {

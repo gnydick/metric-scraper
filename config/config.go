@@ -2,21 +2,49 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
+// Kind is what the scraper scrapes.
+type Kind string
+
+const (
+	KindCadvisor Kind = "cadvisor"
+	KindService  Kind = "service"
+)
+
+// SinkKind is where the scraper sends metrics.
+type SinkKind string
+
+const (
+	SinkOpentsdb SinkKind = "opentsdb"
+)
+
+// Mode is where the scraper runs: in a cluster, or outside one.
+type Mode string
+
+const (
+	ModeDeployed    Mode = "deployed"
+	ModeDevelopment Mode = "development"
+)
+
+// Config is a validated configuration. The fields are private and FileBuild is the one way to fill
+// them, so a Config from FileBuild has a known kind, sink and mode and a positive interval. The
+// zero Config has none of them; NewScraper refuses it.
 type Config struct {
 	debug        bool
-	kind         string
+	kind         Kind
 	disco        string
 	ident        string
 	deploymentId string
-	interval     string // duration syntax
+	interval     time.Duration
 	orch         string
 	metric       string
-	sink         string
-	mode         string // deployed or development - running in a cluster vs running outside cluster
+	sink         SinkKind
+	mode         Mode
 	optionals    map[string]map[string]string
 }
 
@@ -30,7 +58,7 @@ func (c *Config) Optionals() *map[string]map[string]string {
 	return &c.optionals
 }
 
-func (c *Config) Mode() string {
+func (c *Config) Mode() Mode {
 	return c.mode
 }
 
@@ -42,7 +70,7 @@ func (c *Config) Orch() string {
 	return c.orch
 }
 
-func (c *Config) Interval() string {
+func (c *Config) Interval() time.Duration {
 	return c.interval
 }
 
@@ -58,14 +86,14 @@ func (c *Config) Disco() string {
 	return c.disco
 }
 
-func (c *Config) Kind() string {
+func (c *Config) Kind() Kind {
 	return c.kind
 }
 
 func (c *Config) Debug() bool {
 	return c.debug
 }
-func (c *Config) Sink() string {
+func (c *Config) Sink() SinkKind {
 	return c.sink
 }
 
@@ -85,7 +113,7 @@ func EnvBuild() (config Config) {
 	if len(kind) == 0 {
 		log.Fatal("Must specify scraper KIND env var.")
 	} else {
-		c.kind = kind
+		c.kind = Kind(kind)
 	}
 
 	disco := os.Getenv("DISCO")
@@ -107,14 +135,14 @@ func EnvBuild() (config Config) {
 		log.Fatal("Must specify interval, INTERVAL env var.")
 
 	} else {
-		c.interval = interval
+		c.interval, _ = time.ParseDuration(interval)
 	}
 	sink := os.Getenv("SINK")
 	if len(sink) == 0 {
 		log.Fatal("Must specify sink, SINK env var.")
 
 	} else {
-		c.sink = sink
+		c.sink = SinkKind(sink)
 	}
 
 	mode := os.Getenv("MODE")
@@ -122,7 +150,7 @@ func EnvBuild() (config Config) {
 		log.Fatal("Must specify sink, SINK env var.")
 
 	} else {
-		c.mode = mode
+		c.mode = Mode(mode)
 	}
 
 	kubeConfig := os.Getenv("KUBE_CONFIG")
@@ -133,42 +161,117 @@ func EnvBuild() (config Config) {
 	return
 }
 
-func FileBuild(configFile string) Config {
-	configuration := Config{}
-	data := make(map[string]interface{})
-	file, _err := os.Open(configFile)
-	if _err != nil {
-		log.Fatal(_err.Error())
+// FileBuild loads and validates the config file. A file that cannot be read, is not JSON, lacks a
+// field, has a field of the wrong type or holds a value the scraper does not know gives an error
+// naming the file and the field, and no usable Config.
+func FileBuild(configFile string) (Config, error) {
+	file, err := os.Open(configFile)
+	if err != nil {
+		return Config{}, fmt.Errorf("config file %s: %w", configFile, err)
 	}
 	defer file.Close()
-	decoder := json.NewDecoder(file)
-	_err = decoder.Decode(&data)
-	if _err != nil {
-		log.Fatal(_err.Error())
-	}
-	configuration.debug = data["debug"].(bool)
-	configuration.kind = data["kind"].(string)
-	configuration.disco = data["disco"].(string)
-	configuration.ident = data["ident"].(string)
-	configuration.deploymentId = data["deploymentId"].(string)
-	configuration.interval = data["interval"].(string)
-	configuration.orch = data["orch"].(string)
-	configuration.metric = data["metric"].(string)
-	configuration.orch = data["orch"].(string)
-	configuration.sink = data["sink"].(string)
-	configuration.mode = data["mode"].(string)
-	opts := data["optionals"]
 
-	m := make(map[string]map[string]string)
-	bites, _err := json.Marshal(&opts)
-	if _err != nil {
-		log.Fatalf("error: %v", _err)
+	data := make(map[string]interface{})
+	if err := json.NewDecoder(file).Decode(&data); err != nil {
+		return Config{}, fmt.Errorf("config file %s: not valid JSON: %w", configFile, err)
 	}
-	_err = json.Unmarshal(bites, &m)
-	if _err != nil {
-		log.Fatalf("error: %v", _err)
-	}
-	configuration.optionals = m
 
-	return configuration
+	configuration, err := validate(data)
+	if err != nil {
+		return Config{}, fmt.Errorf("config file %s: %w", configFile, err)
+	}
+	return configuration, nil
+}
+
+// validate turns decoded config data into a Config, or says which field is wrong.
+func validate(data map[string]interface{}) (Config, error) {
+	var configuration Config
+	var err error
+
+	debug, present := data["debug"]
+	if !present {
+		return Config{}, fmt.Errorf("field %q is missing", "debug")
+	}
+	isBool := false
+	if configuration.debug, isBool = debug.(bool); !isBool {
+		return Config{}, fmt.Errorf("field %q must be true or false", "debug")
+	}
+
+	text := func(name string) string {
+		if err != nil {
+			return ""
+		}
+		value, present := data[name]
+		if !present {
+			err = fmt.Errorf("field %q is missing", name)
+			return ""
+		}
+		s, isString := value.(string)
+		if !isString {
+			err = fmt.Errorf("field %q must be a string", name)
+			return ""
+		}
+		return s
+	}
+	kind := text("kind")
+	configuration.disco = text("disco")
+	configuration.ident = text("ident")
+	configuration.deploymentId = text("deploymentId")
+	interval := text("interval")
+	configuration.orch = text("orch")
+	configuration.metric = text("metric")
+	sink := text("sink")
+	mode := text("mode")
+	if err != nil {
+		return Config{}, err
+	}
+
+	switch Kind(kind) {
+	case KindCadvisor, KindService:
+		configuration.kind = Kind(kind)
+	default:
+		return Config{}, fmt.Errorf("field %q: unknown value %q, want %q or %q", "kind", kind, KindCadvisor, KindService)
+	}
+	switch SinkKind(sink) {
+	case SinkOpentsdb:
+		configuration.sink = SinkKind(sink)
+	default:
+		return Config{}, fmt.Errorf("field %q: unknown value %q, want %q", "sink", sink, SinkOpentsdb)
+	}
+	switch Mode(mode) {
+	case ModeDeployed, ModeDevelopment:
+		configuration.mode = Mode(mode)
+	default:
+		return Config{}, fmt.Errorf("field %q: unknown value %q, want %q or %q", "mode", mode, ModeDeployed, ModeDevelopment)
+	}
+
+	// A field may be empty only when nothing reads it. The service kind looks its target up by
+	// disco, and the opentsdb sink looks OpenTSDB up by metric.
+	if configuration.kind == KindService && configuration.disco == "" {
+		return Config{}, fmt.Errorf("field %q must not be empty when kind is %q", "disco", KindService)
+	}
+	if configuration.sink == SinkOpentsdb && configuration.metric == "" {
+		return Config{}, fmt.Errorf("field %q must not be empty when sink is %q", "metric", SinkOpentsdb)
+	}
+
+	configuration.interval, err = time.ParseDuration(interval)
+	if err != nil {
+		return Config{}, fmt.Errorf("field %q: %q is not a duration such as \"30s\"", "interval", interval)
+	}
+	if configuration.interval <= 0 {
+		return Config{}, fmt.Errorf("field %q: %q must be more than zero", "interval", interval)
+	}
+
+	// optionals may be left out. When present it is a map of maps of strings.
+	optionals := make(map[string]map[string]string)
+	bites, err := json.Marshal(data["optionals"])
+	if err == nil {
+		err = json.Unmarshal(bites, &optionals)
+	}
+	if err != nil {
+		return Config{}, fmt.Errorf("field %q must be a map of maps of strings", "optionals")
+	}
+	configuration.optionals = optionals
+
+	return configuration, nil
 }
