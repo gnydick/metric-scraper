@@ -91,6 +91,8 @@ func TestUnmarshalRefusesAMetricLineWithABadValueOrTag(t *testing.T) {
 		// Only a comma after the last tag is accepted; an empty tag elsewhere is still bad.
 		{"empty tag in the middle", `foo{a="b",,c="d"} 1`},
 		{"nothing but a comma", `foo{,} 1`},
+		{"two commas after the last tag", `foo{a="b",,} 1`},
+		{"comma before the first tag", `foo{,a="b"} 1`},
 	}
 	parsers := []struct {
 		name  string
