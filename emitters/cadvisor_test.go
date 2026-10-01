@@ -20,8 +20,9 @@ func TestScanLogsFetchErrorTextExactly(t *testing.T) {
 
 	logged := testsupport.CaptureStdout(t, emitter.Scan)
 
-	// The observer is alive only if an error line was printed at all.
-	if !strings.Contains(logged, "[ERROR]") {
+	// The observer is alive only if an error line was printed at all. Off Windows the library wraps
+	// the level in colour codes, so the brackets are not next to it.
+	if !strings.Contains(logged, "ERROR") {
 		t.Fatalf("no error line was printed: %q", logged)
 	}
 	if !strings.Contains(logged, url) {

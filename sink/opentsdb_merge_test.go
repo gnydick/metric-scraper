@@ -77,8 +77,9 @@ func TestSendWritesAndLogsMetricTextExactly(t *testing.T) {
 		t.Fatal("the stand-in OpenTSDB received nothing within 30s")
 	}
 
-	// The observer is alive only if the debug lines printed at all.
-	if !strings.Contains(logged, "[DEBUG]") {
+	// The observer is alive only if the debug lines printed at all. Off Windows the library wraps
+	// the level in colour codes, so the brackets are not next to it.
+	if !strings.Contains(logged, "DEBUG") {
 		t.Fatalf("no debug line was printed: %q", logged)
 	}
 	for _, want := range []string{
