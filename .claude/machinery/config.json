@@ -2,7 +2,8 @@
   "worktree": "always",
   "tiers": {
     "assignment": "propose-per-commit",
-    "declaration": "build tag: no tag = fast; //go:build merge = merge; //go:build heavy = heavy"
+    "declaration": "build tag: no tag = fast; //go:build merge = merge; //go:build heavy = heavy",
+    "fast": "go vet <components> && go test <components>"
   },
   "components": {
     ".": "metric-scraper.go",
@@ -16,5 +17,8 @@
     "./sink": "sink",
     "./targeting": "targeting",
     "./util": "util"
+  },
+  "checks": {
+    "commit": "node -e \"const o=require('child_process').execSync('gofmt -l .').toString();if(o.trim()){process.stdout.write(o);process.exit(1)}\""
   }
 }
