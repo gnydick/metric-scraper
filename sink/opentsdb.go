@@ -1,12 +1,14 @@
 package sink
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/Unknwon/log"
 	c "github.com/gnydick/metric-scraper/config"
 	m "github.com/gnydick/metric-scraper/metric"
 	op "github.com/gnydick/metric-scraper/output"
 	. "github.com/gnydick/metric-scraper/util"
+	"io"
 	"net"
 	"sync"
 )
@@ -50,6 +52,13 @@ func (o *Opentsdb) Send() {
 		panic(err)
 	}
 
+	// Replies are read on their own goroutine, so a slow or silent OpenTSDB never holds up a put.
+	repliesDone := make(chan struct{})
+	go func() {
+		logReplies(conn)
+		close(repliesDone)
+	}()
+
 	x := 0
 
 	for metric := range *(o.receiver) {
@@ -70,6 +79,29 @@ func (o *Opentsdb) Send() {
 		x += 1
 	}
 	conn.Close()
+	// Closing the connection ends the reply reader.
+	<-repliesDone
+}
+
+// replyLogLimit is the most bytes of one OpenTSDB reply line that are logged.
+const replyLogLimit = 1024
+
+// logReplies logs each line OpenTSDB writes back at ERROR, until replies ends. Send only writes
+// puts, and OpenTSDB answers a put only to reject it, so every line is a rejected metric (#15).
+func logReplies(replies io.Reader) {
+	reader := bufio.NewReaderSize(replies, replyLogLimit)
+	midLine := false
+	for {
+		chunk, isPrefix, err := reader.ReadLine()
+		if err != nil {
+			return
+		}
+		// Only the start of a line is logged; the rest of an over-long line is read and dropped.
+		if !midLine && len(chunk) > 0 {
+			ErrorLog("OpenTSDB rejected a metric: %s", string(chunk))
+		}
+		midLine = isPrefix
+	}
 }
 
 func hasKey(key string, keys []string) bool {
