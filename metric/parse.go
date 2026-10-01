@@ -31,7 +31,8 @@ func parseTagged(millis int64, line string) (*Metric, error) {
 		return nil, err
 	}
 	tags := make(map[string]string)
-	for _, tag := range strings.Split(tagString, ",") {
+	// A comma after the last tag is legal in the format, so it is dropped before splitting.
+	for _, tag := range strings.Split(strings.TrimSuffix(tagString, ","), ",") {
 		pair := strings.Split(tag, "=")
 		if len(pair) != 2 {
 			return nil, fmt.Errorf("metric %s: tag %q is not key=value", name, tag)

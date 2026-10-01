@@ -28,6 +28,11 @@ func TestUnmarshalParsesAMetricLine(t *testing.T) {
 			Metric{Metric: "http_requests", Tags: map[string]string{"code": "200"}, Value: 3, Time: millis}},
 		{"cadvisor machine line has no tags", CadvUnmarshal, `machine_cpu_cores 4`,
 			Metric{Metric: "machine_cpu_cores", Tags: map[string]string{}, Value: 4, Time: millis}},
+		// A comma after the last tag is legal in the format; some clients write one on every line.
+		{"cadvisor trailing comma", CadvUnmarshal, `jvm_threads{state="runnable",} 7.0`,
+			Metric{Metric: "jvm_threads", Tags: map[string]string{"state": "runnable"}, Value: 7, Time: millis}},
+		{"service trailing comma", SvcUnmarshal, `jvm_threads{state="runnable",} 7.0`,
+			Metric{Metric: "jvm_threads", Tags: map[string]string{"state": "runnable"}, Value: 7, Time: millis}},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -83,6 +88,9 @@ func TestUnmarshalRefusesAMetricLineWithABadValueOrTag(t *testing.T) {
 		{"tag with no equals sign", `foo{a="b",c} 1`},
 		{"tag value holding an equals sign", `foo{a="x=y"} 1`},
 		{"tag value holding a comma", `foo{a="x,y"} 1`},
+		// Only a comma after the last tag is accepted; an empty tag elsewhere is still bad.
+		{"empty tag in the middle", `foo{a="b",,c="d"} 1`},
+		{"nothing but a comma", `foo{,} 1`},
 	}
 	parsers := []struct {
 		name  string
