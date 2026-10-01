@@ -55,10 +55,11 @@ func (ds *DataSet) RegisterMetric(metric *m.Metric) {
 		switch mName := (*metric).Metric; mName {
 		case "machine_cpu_cores":
 			metric.Tags["cpu"] = "total"
-			(*ds).nodes[(*ds).node.Name].metrics[(*metric).Metric] = metric
+			// The node may not exist yet: a machine line can be the first line of a scan (#23).
+			(*ds).getOrCreateNode((*ds).node.Name).metrics[(*metric).Metric] = metric
 
 		case "machine_memory_bytes":
-			(*ds).nodes[(*ds).node.Name].metrics[(*metric).Metric] = metric
+			(*ds).getOrCreateNode((*ds).node.Name).metrics[(*metric).Metric] = metric
 		}
 
 	} else {
