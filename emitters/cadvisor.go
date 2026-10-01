@@ -39,15 +39,8 @@ func NewCadvisor(sink k.Sink, c *c.Config, node *v1.Node) Cadvisor {
 
 }
 
-func (c Cadvisor) parseLine(timestamp int64, line *string) *m.Metric {
-
-	metric := m.CadvUnmarshal(timestamp, line)
-	if len((*metric).Tags) == 0 {
-		(*metric).Tags = make(map[string]string)
-
-	}
-
-	return metric
+func (c Cadvisor) parseLine(timestamp int64, line string) (*m.Metric, error) {
+	return m.CadvUnmarshal(timestamp, line)
 }
 
 func (c Cadvisor) GetName() string {
@@ -93,7 +86,11 @@ func (c Cadvisor) Scan() {
 						gotType = true
 					}
 				} else if gotType == true {
-					metric := c.parseLine(millis, &line)
+					metric, err := c.parseLine(millis, line)
+					if err != nil {
+						logSkipped(line, err)
+						continue
+					}
 					(*metric).Tags["node"] = (*c.node).Name
 					c.ds.RegisterMetric(metric)
 
