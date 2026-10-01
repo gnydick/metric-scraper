@@ -54,17 +54,18 @@ func (o *Opentsdb) Send() {
 
 	for metric := range *(o.receiver) {
 		metricText := fmt.Sprintf("%s", op.StringMarshal(metric))
-		_, _err := fmt.Fprintf(conn, metricText)
+		// The metric text is data, never a format string: it is written as is (#13).
+		_, _err := fmt.Fprint(conn, metricText)
 
 		if hasKey("container_name", getKeys((*metric).Tags)) {
 			if (*metric).Tags["container_name"] == "adminserver" {
-				DebugLog(fmt.Sprintf("%s %s", (*metric).Metric, (*metric).Tags))
-				DebugLog(metricText)
+				DebugLog("%s %s", (*metric).Metric, (*metric).Tags)
+				DebugLog("%s", metricText)
 			}
 		}
 
 		if _err != nil {
-			log.Fatal(_err.Error())
+			log.Fatal("%s", _err.Error())
 		}
 		x += 1
 	}

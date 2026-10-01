@@ -61,12 +61,12 @@ func (c Cadvisor) Scan() {
 	resp, err := http.Get(c.url)
 
 	if err != nil {
-		ErrorLog(err.Error())
+		ErrorLog("%s", err.Error())
 	} else {
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			ErrorLog(err.Error())
+			ErrorLog("%s", err.Error())
 		} else {
 			scanner := bufio.NewScanner(strings.NewReader(string(body)))
 

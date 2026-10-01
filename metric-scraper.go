@@ -41,7 +41,7 @@ func main() {
 	go func() {
 		_err := http.ListenAndServe(":8765", router)
 		if _err != nil {
-			log.Fatal(_err.Error())
+			log.Fatal("%s", _err.Error())
 		}
 	}()
 

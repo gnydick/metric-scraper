@@ -54,7 +54,7 @@ func CadvUnmarshal(millis int64, line *string) *Metric {
 			value := string(machine_re.ExpandString(machine_value_bytes, "${value}", *line, matches))
 			metric.Value, _err = strconv.ParseFloat(value, 64)
 			if _err != nil {
-				util.FatalLog(_err.Error())
+				util.FatalLog("%s", _err.Error())
 			}
 		}
 	}
