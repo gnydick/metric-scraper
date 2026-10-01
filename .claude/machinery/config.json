@@ -3,5 +3,18 @@
   "tiers": {
     "assignment": "propose-per-commit",
     "declaration": "build tag: no tag = fast; //go:build merge = merge; //go:build heavy = heavy"
+  },
+  "components": {
+    ".": "metric-scraper.go",
+    "./config": "config",
+    "./data/cadvisor": "data/cadvisor",
+    "./data/service": "data/service",
+    "./emitters": "emitters",
+    "./metric": "metric",
+    "./output": "output",
+    "./scraper": "scraper",
+    "./sink": "sink",
+    "./targeting": "targeting",
+    "./util": "util"
   }
 }
