@@ -19,7 +19,7 @@ func WriteConfigFile(t *testing.T, changes map[string]interface{}) string {
 		"deploymentId": "test",
 		"interval":     "5s",
 		"orch":         "",
-		"metric":       "",
+		"metric":       "_telnet._tcp.opentsdb.test.invalid",
 		"sink":         "opentsdb",
 		"mode":         "development",
 		"optionals":    map[string]interface{}{"development": map[string]interface{}{"path": ""}},

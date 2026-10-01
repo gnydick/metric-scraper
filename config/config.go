@@ -245,6 +245,15 @@ func validate(data map[string]interface{}) (Config, error) {
 		return Config{}, fmt.Errorf("field %q: unknown value %q, want %q or %q", "mode", mode, ModeDeployed, ModeDevelopment)
 	}
 
+	// A field may be empty only when nothing reads it. The service kind looks its target up by
+	// disco, and the opentsdb sink looks OpenTSDB up by metric.
+	if configuration.kind == KindService && configuration.disco == "" {
+		return Config{}, fmt.Errorf("field %q must not be empty when kind is %q", "disco", KindService)
+	}
+	if configuration.sink == SinkOpentsdb && configuration.metric == "" {
+		return Config{}, fmt.Errorf("field %q must not be empty when sink is %q", "metric", SinkOpentsdb)
+	}
+
 	configuration.interval, err = time.ParseDuration(interval)
 	if err != nil {
 		return Config{}, fmt.Errorf("field %q: %q is not a duration such as \"30s\"", "interval", interval)

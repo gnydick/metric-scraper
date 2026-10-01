@@ -45,6 +45,14 @@ func TestFileBuildLoadsTheSampleConfigs(t *testing.T) {
 	}
 }
 
+// The cadvisor kind does not read disco, so an empty one is not a bad config.
+func TestFileBuildAllowsAnEmptyDiscoForTheCadvisorKind(t *testing.T) {
+	path := testsupport.WriteConfigFile(t, map[string]interface{}{"kind": "cadvisor", "disco": ""})
+	if _, err := FileBuild(path); err != nil {
+		t.Errorf("FileBuild err = %v, want nil", err)
+	}
+}
+
 // The optionals block may be left out.
 func TestFileBuildAllowsMissingOptionals(t *testing.T) {
 	path := testsupport.WriteConfigFile(t, map[string]interface{}{"optionals": nil})
@@ -80,6 +88,10 @@ func TestFileBuildRefusesABadConfig(t *testing.T) {
 		{"interval of zero", map[string]interface{}{"interval": "0s"}, "interval"},
 		{"negative interval", map[string]interface{}{"interval": "-5s"}, "interval"},
 		{"optionals of the wrong shape", map[string]interface{}{"optionals": "none"}, "optionals"},
+		// A field may be empty only when nothing reads it: the service kind looks its target up
+		// by disco, and the opentsdb sink looks OpenTSDB up by metric.
+		{"service kind with an empty disco", map[string]interface{}{"kind": "service", "disco": ""}, "disco"},
+		{"opentsdb sink with an empty metric", map[string]interface{}{"metric": ""}, "metric"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
