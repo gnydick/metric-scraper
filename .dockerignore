@@ -1,8 +1,12 @@
 .idea
 helm
+.git
 .gitignore
+.githooks
+.claude
 *.json
 Dockerfile
 *.iml
 README.md
 .dockerignore
+.remember
