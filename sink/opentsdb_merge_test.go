@@ -3,8 +3,10 @@
 package sink
 
 import (
+	"bufio"
 	"io"
 	"net"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -89,6 +91,86 @@ func TestSendWritesAndLogsMetricTextExactly(t *testing.T) {
 		if !strings.Contains(logged, want) {
 			t.Errorf("debug output %q does not hold %q", logged, want)
 		}
+	}
+}
+
+// Send logs a rejection OpenTSDB writes back, at the default LogLevel (#15). The test reads stdout
+// as it is written, so it can wait for the line before it lets Send finish.
+func TestSendLogsARejectionFromOpenTSDB(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ln.Close()
+
+	const reply = "put: illegal argument: Invalid metric name"
+	go func() {
+		conn, err := ln.Accept()
+		if err != nil {
+			return
+		}
+		defer conn.Close()
+		io.WriteString(conn, reply+"\n")
+		io.Copy(io.Discard, conn)
+	}()
+
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	saved := os.Stdout
+	os.Stdout = w
+	restored := false
+	restore := func() {
+		if !restored {
+			restored = true
+			os.Stdout = saved
+			w.Close()
+		}
+	}
+	defer restore()
+
+	lines := make(chan string, 16)
+	go func() {
+		scanner := bufio.NewScanner(r)
+		for scanner.Scan() {
+			lines <- scanner.Text()
+		}
+		close(lines)
+	}()
+
+	metrics := make(chan *m.Metric)
+	sink := &Opentsdb{endpoint: ln.Addr().String(), receiver: &metrics}
+	sent := make(chan struct{})
+	go func() {
+		sink.Send()
+		close(sent)
+	}()
+
+	var got string
+	select {
+	case got = <-lines:
+	case <-time.After(30 * time.Second):
+		// Generous on purpose: it only catches a rejection that is never logged.
+	}
+
+	close(metrics)
+	select {
+	case <-sent:
+	case <-time.After(30 * time.Second):
+		t.Error("Send did not return 30s after its channel closed")
+	}
+	restore()
+
+	if got == "" {
+		t.Fatal("Send logged nothing within 30s of OpenTSDB writing a rejection")
+	}
+	if !strings.HasSuffix(got, "OpenTSDB rejected a metric: "+reply) {
+		t.Errorf("logged %q, want a line ending in the rejection %q", got, reply)
+	}
+	if !strings.Contains(got, "ERROR") {
+		t.Errorf("logged %q, want it at ERROR", got)
 	}
 }
 

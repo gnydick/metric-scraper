@@ -59,8 +59,8 @@ func TestLogRepliesKeepsReadingAfterAnOverlongLine(t *testing.T) {
 	if !strings.HasSuffix(got[1], "OpenTSDB rejected a metric: put: second") {
 		t.Errorf("second rejection line = %q, want it to end with the second reply", got[1])
 	}
-	// The over-long reply is cut, not printed whole.
-	if len(got[0]) >= 200000 {
-		t.Errorf("the over-long reply was logged whole (%d bytes)", len(got[0]))
+	// The over-long reply is cut at 1024 bytes. The log line adds its prefix, timestamp and level.
+	if len(got[0]) > 1024+256 {
+		t.Errorf("the over-long reply was logged as %d bytes, want at most 1024 of it", len(got[0]))
 	}
 }
