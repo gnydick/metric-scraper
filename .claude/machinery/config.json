@@ -18,6 +18,7 @@
     "./scraper": "scraper",
     "./sink": "sink",
     "./targeting": "targeting",
+    "./telemetry": "telemetry",
     "./util": "util"
   },
   "checks": {
