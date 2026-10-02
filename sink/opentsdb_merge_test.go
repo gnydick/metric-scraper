@@ -12,6 +12,7 @@ import (
 	"time"
 
 	m "github.com/gnydick/metric-scraper/metric"
+	"github.com/gnydick/metric-scraper/telemetry"
 	"github.com/gnydick/metric-scraper/util"
 	"github.com/gnydick/metric-scraper/util/testsupport"
 )
@@ -251,5 +252,64 @@ func TestSendReadsRepliesWhileSending(t *testing.T) {
 		}
 	case <-time.After(30 * time.Second):
 		t.Fatal("the stand-in OpenTSDB received nothing within 30s")
+	}
+}
+
+// Send reports the sink as up while it is connected and as down once it has closed the connection,
+// and counts each metric it writes (#53). Three metrics in, a count of three.
+func TestSendRecordsSinkUpAndWrites(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ln.Close()
+	go func() {
+		conn, err := ln.Accept()
+		if err != nil {
+			return
+		}
+		defer conn.Close()
+		io.Copy(io.Discard, conn)
+	}()
+
+	tel, err := telemetry.New("scraper")
+	if err != nil {
+		t.Fatal(err)
+	}
+	metrics := make(chan *m.Metric)
+	endpoint := ln.Addr().String()
+	sink := &Opentsdb{endpoint: endpoint, receiver: &metrics, telemetry: tel}
+	sent := make(chan struct{})
+	go func() {
+		sink.Send()
+		close(sent)
+	}()
+
+	newMetric := func() *m.Metric {
+		return &m.Metric{Metric: "cpu", Time: 1000, Value: 1.5, Tags: map[string]string{"host": "a"}}
+	}
+	// Send takes a metric only after it has connected, so once this send returns the sink is up.
+	metrics <- newMetric()
+	up := `scraper_sink_up{endpoint="` + endpoint + `",sink="opentsdb"} 1`
+	if page := testsupport.Page(t, tel.Handler(), "/metrics"); !testsupport.HasLine(page, up) {
+		t.Errorf("while connected, the metrics page has no line %q", up)
+	}
+	metrics <- newMetric()
+	metrics <- newMetric()
+	close(metrics)
+	select {
+	case <-sent:
+	case <-time.After(30 * time.Second):
+		t.Fatal("Send did not return 30s after its channel closed")
+	}
+
+	page := testsupport.Page(t, tel.Handler(), "/metrics")
+	for _, want := range []string{
+		`scraper_sink_up{endpoint="` + endpoint + `",sink="opentsdb"} 0`,
+		`scraper_sink_writes_total{result="ok",sink="opentsdb"} 3`,
+	} {
+		if !testsupport.HasLine(page, want) {
+			t.Errorf("the metrics page has no line %q", want)
+		}
 	}
 }

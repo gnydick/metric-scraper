@@ -12,6 +12,7 @@ import (
 	dataCadv "github.com/gnydick/metric-scraper/data/cadvisor"
 	m "github.com/gnydick/metric-scraper/metric"
 	k "github.com/gnydick/metric-scraper/sink"
+	"github.com/gnydick/metric-scraper/telemetry"
 	. "github.com/gnydick/metric-scraper/util"
 )
 
@@ -21,16 +22,19 @@ type Cadvisor struct {
 	ds     *dataCadv.DataSet
 	node   *v1.Node
 	config *c.Config
+	// telemetry records each scan for the metrics page. It may be nil.
+	telemetry *telemetry.Telemetry
 }
 
-func NewCadvisor(sink k.Sink, c *c.Config, node *v1.Node) Cadvisor {
+func NewCadvisor(sink k.Sink, c *c.Config, node *v1.Node, tel *telemetry.Telemetry) Cadvisor {
 	ds := dataCadv.NewDataSet(node)
 	emitter := Cadvisor{
-		url:    fmt.Sprintf("http://%s:%s/metrics/cadvisor", node.Name, "10255"),
-		sink:   sink,
-		ds:     ds,
-		node:   node,
-		config: c,
+		url:       fmt.Sprintf("http://%s:%s/metrics/cadvisor", node.Name, "10255"),
+		sink:      sink,
+		ds:        ds,
+		node:      node,
+		config:    c,
+		telemetry: tel,
 	}
 
 	return emitter
@@ -48,7 +52,8 @@ func (c Cadvisor) GetName() string {
 func (c Cadvisor) Scan(ctx context.Context) {
 	DebugLog("Starting scan on %s", c.node.Name)
 
-	body, err := fetch(ctx, c.url)
+	body, status, err := fetch(ctx, c.url)
+	c.telemetry.Scan("cadvisor", c.GetName(), status, err)
 	if err != nil {
 		ErrorLog("%s", err.Error())
 		return

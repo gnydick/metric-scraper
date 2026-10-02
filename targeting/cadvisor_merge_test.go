@@ -50,7 +50,7 @@ users:
 	if err != nil {
 		t.Fatal(err)
 	}
-	target, err := NewCadvisor(&cfg, "http", nil)
+	target, err := NewCadvisor(&cfg, "http", nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

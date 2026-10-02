@@ -3,40 +3,17 @@ package scraper
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
 	c "github.com/gnydick/metric-scraper/config"
 	"github.com/gnydick/metric-scraper/emitters"
+	"github.com/gnydick/metric-scraper/telemetry"
+	"github.com/gnydick/metric-scraper/util/testsupport"
 )
-
-// The window is two scrape intervals (#7). With a 10s interval the last moment still healthy is
-// 20s after the latest success, or after the start when nothing has succeeded yet.
-func TestProgressHealthyWithinTwoIntervals(t *testing.T) {
-	start := time.Date(2026, 10, 1, 12, 0, 0, 0, time.UTC)
-	interval := 10 * time.Second
-
-	t.Run("no success yet counts from the start", func(t *testing.T) {
-		p := NewProgress(start, interval)
-		if !p.Healthy(start.Add(20 * time.Second)) {
-			t.Error("unhealthy 20s after the start, want healthy: 20s is within 2 x 10s")
-		}
-		if p.Healthy(start.Add(20*time.Second + time.Nanosecond)) {
-			t.Error("healthy 20s+1ns after the start with no success, want unhealthy")
-		}
-	})
-
-	t.Run("a success moves the window", func(t *testing.T) {
-		p := NewProgress(start, interval)
-		p.MarkSuccess(start.Add(30 * time.Second))
-		if !p.Healthy(start.Add(50 * time.Second)) {
-			t.Error("unhealthy 20s after a success, want healthy")
-		}
-		if p.Healthy(start.Add(50*time.Second + time.Nanosecond)) {
-			t.Error("healthy 20s+1ns after the last success, want unhealthy")
-		}
-	})
-}
 
 // fakeTarget stands in for target discovery. It records the context it was given.
 type fakeTarget struct {
@@ -56,16 +33,29 @@ func (f *fakeTarget) EmitterPtrs(ctx context.Context) ([]emitters.Emitter, error
 
 func (f *fakeTarget) GetConfig() *c.Config { return nil }
 
-func newTestScraper(target *fakeTarget, start time.Time, interval time.Duration) *Scraper {
+// newTestScraper builds a scraper of kind "service" around target, recording into its own metrics
+// page.
+func newTestScraper(t *testing.T, target *fakeTarget) *Scraper {
+	t.Helper()
+	tel, err := telemetry.New("scraper")
+	if err != nil {
+		t.Fatal(err)
+	}
 	return &Scraper{
-		target:   target,
-		emitters: make(map[string]*emitters.Emitter),
-		progress: NewProgress(start, interval),
+		target:    target,
+		kind:      "service",
+		emitters:  make(map[string]*emitters.Emitter),
+		telemetry: tel,
 	}
 }
 
-// A discovery that hangs is cut off after one scrape interval, the round ends, and it does not count
-// as progress (#7).
+func metricsPage(t *testing.T, s *Scraper) string {
+	t.Helper()
+	return testsupport.Page(t, s.telemetry.Handler(), "/metrics")
+}
+
+// A discovery that hangs is cut off after one scrape interval, the round ends, and it is counted as
+// a failed discovery round (#7, #53).
 func TestScrapeRoundEndsWhenDiscoveryHangs(t *testing.T) {
 	interval := 200 * time.Millisecond
 	target := &fakeTarget{discover: func(ctx context.Context) ([]emitters.Emitter, error) {
@@ -73,7 +63,7 @@ func TestScrapeRoundEndsWhenDiscoveryHangs(t *testing.T) {
 		return nil, ctx.Err()
 	}}
 	start := time.Now()
-	s := newTestScraper(target, start, interval)
+	s := newTestScraper(t, target)
 
 	done := make(chan struct{})
 	go func() {
@@ -101,39 +91,90 @@ func TestScrapeRoundEndsWhenDiscoveryHangs(t *testing.T) {
 		t.Errorf("discovery deadline %v is not one interval (%v) into the round: want within [%v, %v]",
 			target.deadline, interval, earliest, latest)
 	}
-	if s.progress.Healthy(start.Add(2*interval + time.Nanosecond)) {
-		t.Error("a round whose discovery timed out was counted as progress")
+	want := `scraper_discovery_rounds_total{kind="service",result="error"} 1`
+	if page := metricsPage(t, s); !testsupport.HasLine(page, want) {
+		t.Errorf("the metrics page has no line %q after a discovery that timed out", want)
 	}
 }
 
-// A failed discovery ends the round without a panic and without counting as progress; a
-// successful one counts.
-func TestScrapeRoundMarksProgressOnlyOnSuccess(t *testing.T) {
+// A failed discovery ends the round without a panic. Each round is counted by its result: one
+// failed round and two good rounds give 1 and 2 (#53).
+func TestScrapeRoundCountsDiscoveryByResult(t *testing.T) {
 	interval := 10 * time.Second
-	// Far enough in the past that only a success marked now can make the scraper healthy now.
-	start := time.Now().Add(-time.Hour)
-
-	failing := &fakeTarget{discover: func(ctx context.Context) ([]emitters.Emitter, error) {
-		return nil, errors.New("api server said no")
-	}}
-	s := newTestScraper(failing, start, interval)
-	s.scrapeRound(interval)
-	if failing.calls != 1 {
-		t.Fatalf("discovery ran %d times, want 1", failing.calls)
-	}
-	if s.progress.Healthy(time.Now()) {
-		t.Error("a round whose discovery failed was counted as progress")
-	}
-
-	succeeding := &fakeTarget{discover: func(ctx context.Context) ([]emitters.Emitter, error) {
+	fail := true
+	target := &fakeTarget{discover: func(ctx context.Context) ([]emitters.Emitter, error) {
+		if fail {
+			return nil, errors.New("api server said no")
+		}
 		return []emitters.Emitter{}, nil
 	}}
-	s = newTestScraper(succeeding, start, interval)
+	s := newTestScraper(t, target)
+
 	s.scrapeRound(interval)
-	if succeeding.calls != 1 {
-		t.Fatalf("discovery ran %d times, want 1", succeeding.calls)
+	fail = false
+	s.scrapeRound(interval)
+	s.scrapeRound(interval)
+
+	if target.calls != 3 {
+		t.Fatalf("discovery ran %d times, want 3", target.calls)
 	}
-	if !s.progress.Healthy(time.Now()) {
-		t.Error("a round whose discovery succeeded was not counted as progress")
+	page := metricsPage(t, s)
+	for _, want := range []string{
+		`scraper_discovery_rounds_total{kind="service",result="error"} 1`,
+		`scraper_discovery_rounds_total{kind="service",result="ok"} 2`,
+	} {
+		if !testsupport.HasLine(page, want) {
+			t.Errorf("the metrics page has no line %q", want)
+		}
+	}
+}
+
+// A target that is no longer discovered leaves the metrics page in the round that misses it (#53).
+// Round one finds a and b; round two finds only a.
+func TestScrapeRoundDropsATargetThatIsNoLongerDiscovered(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "")
+	}))
+	defer srv.Close()
+
+	sink := &idleSink{}
+	names := []string{"app=a", "app=b"}
+	var s *Scraper
+	target := &fakeTarget{discover: func(ctx context.Context) ([]emitters.Emitter, error) {
+		var found []emitters.Emitter
+		for _, name := range names {
+			found = append(found, emitters.NewService(sink, nil, srv.URL, name, s.telemetry))
+		}
+		return found, nil
+	}}
+	s = newTestScraper(t, target)
+	interval := 10 * time.Second
+	lineFor := func(name string) string {
+		return `scraper_target_up{kind="service",target="` + name + `"} 1`
+	}
+
+	s.scrapeRound(interval)
+	// The scans run on their own goroutines; wait until both have reported.
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		page := metricsPage(t, s)
+		if testsupport.HasLine(page, lineFor("app=a")) && testsupport.HasLine(page, lineFor("app=b")) {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("the first round's two scans had not reported within 30s")
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+
+	names = []string{"app=a"}
+	s.scrapeRound(interval)
+
+	page := metricsPage(t, s)
+	if testsupport.HasLine(page, lineFor("app=b")) {
+		t.Error("app=b is still on the metrics page after a round that did not discover it")
+	}
+	if !testsupport.HasLine(page, lineFor("app=a")) {
+		t.Error("app=a left the metrics page although it is still discovered")
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/gnydick/metric-scraper/emitters"
 	k "github.com/gnydick/metric-scraper/sink"
 	t "github.com/gnydick/metric-scraper/targeting"
+	"github.com/gnydick/metric-scraper/telemetry"
 	. "github.com/gnydick/metric-scraper/util"
 	"sync"
 	"time"
@@ -18,18 +19,21 @@ type Scraper struct {
 	target          t.Target
 	sink            k.Sink
 	emitters        map[string]*emitters.Emitter
-	progress        *Progress
+	// kind labels this scraper's discovery rounds and targets on the metrics page.
+	kind string
+	// telemetry records discovery for the metrics page. It may be nil.
+	telemetry *telemetry.Telemetry
 }
 
 var x = 0
 
 // NewScraper builds the sink and the target the config names. A sink or target that cannot be set
 // up is an error for the caller to report at startup, never a panic (#17).
-func NewScraper(configPtr *c.Config) (*Scraper, error) {
+func NewScraper(configPtr *c.Config, tel *telemetry.Telemetry) (*Scraper, error) {
 	var sink k.Sink
 	switch configPtr.Sink() {
 	case c.SinkOpentsdb:
-		otsdb, err := k.NewOpentsdbSink(configPtr, &sync.WaitGroup{})
+		otsdb, err := k.NewOpentsdbSink(configPtr, &sync.WaitGroup{}, tel)
 		if err != nil {
 			return nil, err
 		}
@@ -43,13 +47,13 @@ func NewScraper(configPtr *c.Config) (*Scraper, error) {
 	var target t.Target
 	switch configPtr.Kind() {
 	case c.KindCadvisor:
-		cadvisor, err := t.NewCadvisor(configPtr, "http", sink)
+		cadvisor, err := t.NewCadvisor(configPtr, "http", sink, tel)
 		if err != nil {
 			return nil, err
 		}
 		target = cadvisor
 	case c.KindService:
-		target = t.NewService(configPtr, "http", sink)
+		target = t.NewService(configPtr, "http", sink, tel)
 	default:
 		return nil, fmt.Errorf("no target is built for kind %q", configPtr.Kind())
 	}
@@ -60,7 +64,8 @@ func NewScraper(configPtr *c.Config) (*Scraper, error) {
 		target:          target,
 		sink:            sink,
 		emitters:        make(map[string]*emitters.Emitter),
-		progress:        NewProgress(time.Now(), configPtr.Interval()),
+		kind:            string(configPtr.Kind()),
+		telemetry:       tel,
 	}, nil
 }
 
@@ -82,11 +87,6 @@ func (s *Scraper) Scrape() {
 	}
 }
 
-// Healthy reports whether target discovery succeeded within the last two scrape intervals.
-func (s *Scraper) Healthy(now time.Time) bool {
-	return s.progress.Healthy(now)
-}
-
 // scrapeRound discovers the targets and starts a scan of each. Discovery gets one interval; if it
 // fails or runs out of time the round is skipped and the next interval tries again. Each scan's
 // fetch also gets one interval, so a target that hangs cannot hold a scan for good (#21).
@@ -94,11 +94,17 @@ func (s *Scraper) scrapeRound(interval time.Duration) {
 	ctx, cancel := context.WithTimeout(context.Background(), interval)
 	found, err := s.target.EmitterPtrs(ctx)
 	cancel()
+	s.telemetry.DiscoveryRound(s.kind, err)
 	if err != nil {
 		ErrorLog("Target discovery failed, skipping this round: %s", err.Error())
 		return
 	}
-	s.progress.MarkSuccess(time.Now())
+	// A target this round did not find leaves the metrics page.
+	names := make([]string, len(found))
+	for i, emitter := range found {
+		names[i] = emitter.GetName()
+	}
+	s.telemetry.KeepTargets(s.kind, names)
 
 	for _, emitter := range found {
 		s.emitters[emitter.GetName()] = &emitter

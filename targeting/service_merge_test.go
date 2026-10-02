@@ -23,7 +23,7 @@ func TestServiceEmitterPtrsReturnsAnErrorWhenTheLookupFails(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	target := NewService(&cfg, "http", nil)
+	target := NewService(&cfg, "http", nil, nil)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()

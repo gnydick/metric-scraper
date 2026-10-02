@@ -8,19 +8,23 @@ import (
 	c "github.com/gnydick/metric-scraper/config"
 	e "github.com/gnydick/metric-scraper/emitters"
 	k "github.com/gnydick/metric-scraper/sink"
+	"github.com/gnydick/metric-scraper/telemetry"
 )
 
 type Service struct {
 	config *c.Config
 	scheme string
 	sink   k.Sink
+	// telemetry is handed to the emitter. It may be nil.
+	telemetry *telemetry.Telemetry
 }
 
-func NewService(config *c.Config, scheme string, sink k.Sink) Service {
+func NewService(config *c.Config, scheme string, sink k.Sink, tel *telemetry.Telemetry) Service {
 	service := Service{
-		config: config,
-		scheme: scheme,
-		sink:   sink,
+		config:    config,
+		scheme:    scheme,
+		sink:      sink,
+		telemetry: tel,
 	}
 	return service
 }
@@ -38,7 +42,7 @@ func (s Service) EmitterPtrs(ctx context.Context) ([]e.Emitter, error) {
 	}
 	emitters := make([]e.Emitter, 1)
 
-	emitters[0] = e.NewService(s.sink, s.config, endpoint, "app="+s.config.Ident())
+	emitters[0] = e.NewService(s.sink, s.config, endpoint, "app="+s.config.Ident(), s.telemetry)
 	return emitters, nil
 }
 

@@ -28,19 +28,23 @@ func newScanClient() *http.Client {
 	return &http.Client{Transport: transport}
 }
 
-// fetch GETs url and returns the whole body. It ends when ctx does, whether the target is slow to
-// answer or slow to finish its body (#21).
-func fetch(ctx context.Context, url string) ([]byte, error) {
+// fetch GETs url and returns the whole body and the HTTP status. It ends when ctx does, whether the
+// target is slow to answer or slow to finish its body (#21).
+func fetch(ctx context.Context, url string) (body []byte, status int, err error) {
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	response, err := scanClient.Do(request)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer response.Body.Close()
-	return io.ReadAll(response.Body)
+	body, err = io.ReadAll(response.Body)
+	if err != nil {
+		return nil, 0, err
+	}
+	return body, response.StatusCode, nil
 }
 
 // logSkipped reports a line a scan left out. A line that is not a metric is ordinary and logs at

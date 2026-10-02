@@ -12,7 +12,7 @@ import (
 func TestStartupFailsOnABadConfig(t *testing.T) {
 	path := testsupport.WriteConfigFile(t, map[string]interface{}{"kind": "nodes"})
 
-	scraper, err := startup(path)
+	scraper, _, err := startup(path)
 	if err == nil {
 		t.Fatal("startup err = nil for a config with an unknown kind, want a validation error")
 	}

@@ -1,48 +1,61 @@
 package main
 
 import (
-	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
-	s "github.com/gnydick/metric-scraper/scraper"
+	"github.com/gnydick/metric-scraper/telemetry"
+	"github.com/gnydick/metric-scraper/util/testsupport"
 )
 
-// /healthz answers 503 when no target discovery succeeded within two scrape intervals, and 200
-// otherwise (#7). The handler reads the same Progress the scrape loop writes.
-func TestHealthzReflectsScrapeProgress(t *testing.T) {
-	interval := 10 * time.Second
-
-	cases := []struct {
-		name string
-		// sinceSuccess is how long ago the last success was when /healthz is asked.
-		sinceSuccess time.Duration
-		wantStatus   int
-	}{
-		{"success one interval ago", interval, http.StatusOK},
-		{"no success for an hour", time.Hour, http.StatusServiceUnavailable},
+func newTestTelemetry(t *testing.T) *telemetry.Telemetry {
+	t.Helper()
+	tel, err := telemetry.New("scraper")
+	if err != nil {
+		t.Fatal(err)
 	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			progress := s.NewProgress(time.Now().Add(-tc.sinceSuccess), interval)
-			handler := healthzHandler(func() bool { return progress.Healthy(time.Now()) })
+	return tel
+}
 
-			rec := httptest.NewRecorder()
-			handler(rec, httptest.NewRequest(http.MethodGet, "/healthz", nil))
+// /healthz answers OK whenever the process is running; nothing else changes its answer
+// (docs/dictated-specs/health-and-metrics.md, /healthz). It is asked here with nothing recorded,
+// and again with the sink down and discovery failing.
+func TestHealthzIsOKWhateverTheComponentsReport(t *testing.T) {
+	tel := newTestTelemetry(t)
+	router := newRouter(tel)
 
-			if rec.Code != tc.wantStatus {
-				t.Errorf("status = %d, want %d", rec.Code, tc.wantStatus)
-			}
-			// The body stays the JSON report in both cases.
-			var body map[string]string
-			if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil {
-				t.Fatalf("body %q is not the JSON health report: %v", rec.Body.String(), err)
-			}
-			if _, ok := body["uptime"]; !ok {
-				t.Errorf("body %v has no uptime", body)
-			}
-		})
+	ask := func(state string) {
+		t.Helper()
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/healthz", nil))
+		if rec.Code != http.StatusOK {
+			t.Errorf("%s: /healthz status = %d, want 200", state, rec.Code)
+		}
+		if rec.Body.String() != "OK" {
+			t.Errorf("%s: /healthz body = %q, want OK", state, rec.Body.String())
+		}
+	}
+
+	ask("nothing recorded")
+
+	tel.SinkUp("opentsdb", "tsdb:4242", false)
+	tel.DiscoveryRound("cadvisor", errors.New("api server said no"))
+	tel.Scan("cadvisor", "node-a", 0, errors.New("connection refused"))
+	ask("sink down, discovery and scans failing")
+}
+
+// The metrics page is served at /metrics by the same router, and shows what was recorded
+// (docs/dictated-specs/health-and-metrics.md, Metrics page).
+func TestMetricsPageIsServedAtMetrics(t *testing.T) {
+	tel := newTestTelemetry(t)
+	tel.SinkUp("opentsdb", "tsdb:4242", true)
+
+	page := testsupport.Page(t, newRouter(tel), "/metrics")
+
+	want := `scraper_sink_up{endpoint="tsdb:4242",sink="opentsdb"} 1`
+	if !testsupport.HasLine(page, want) {
+		t.Errorf("GET /metrics has no line %q", want)
 	}
 }

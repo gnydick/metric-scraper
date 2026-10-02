@@ -25,7 +25,7 @@ func TestNewCadvisorRefusesAKubeconfigThatCannotBeLoaded(t *testing.T) {
 		t.Fatalf("test config has mode %q, want development", cfg.Mode())
 	}
 
-	_, err = NewCadvisor(&cfg, "http", nil)
+	_, err = NewCadvisor(&cfg, "http", nil, nil)
 	if err == nil {
 		t.Fatal("NewCadvisor err = nil for a kubeconfig file that does not exist, want an error")
 	}

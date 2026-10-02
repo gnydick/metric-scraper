@@ -10,6 +10,7 @@ import (
 	dataSvc "github.com/gnydick/metric-scraper/data/service"
 	m "github.com/gnydick/metric-scraper/metric"
 	k "github.com/gnydick/metric-scraper/sink"
+	"github.com/gnydick/metric-scraper/telemetry"
 	. "github.com/gnydick/metric-scraper/util"
 )
 
@@ -18,9 +19,11 @@ type Service struct {
 	identTag    string
 	sink        k.Sink
 	serviceData *dataSvc.ServiceData
+	// telemetry records each scan for the metrics page. It may be nil.
+	telemetry *telemetry.Telemetry
 }
 
-func NewService(sink k.Sink, c *c.Config, url string, identTag string) Service {
+func NewService(sink k.Sink, c *c.Config, url string, identTag string, tel *telemetry.Telemetry) Service {
 	svcData := dataSvc.NewServiceData()
 
 	emitter := Service{
@@ -28,6 +31,7 @@ func NewService(sink k.Sink, c *c.Config, url string, identTag string) Service {
 		identTag:    identTag,
 		sink:        sink,
 		serviceData: svcData,
+		telemetry:   tel,
 	}
 
 	return emitter
@@ -46,7 +50,8 @@ func (svc Service) Scan(ctx context.Context) {
 	DebugLog("Starting scan")
 
 	// A failed fetch is logged and the scan ends, as in the cadvisor emitter. It is not a panic (#21).
-	body, err := fetch(ctx, svc.url)
+	body, status, err := fetch(ctx, svc.url)
+	svc.telemetry.Scan("service", svc.GetName(), status, err)
 	if err != nil {
 		ErrorLog("%s", err.Error())
 		return

@@ -53,6 +53,26 @@ func TestFileBuildAllowsAnEmptyDiscoForTheCadvisorKind(t *testing.T) {
 	}
 }
 
+// The metrics prefix is an optional field (#53). Left out, it is "scraper"; given, it is what the
+// file states.
+func TestFileBuildReadsTheMetricsPrefix(t *testing.T) {
+	cfg, err := FileBuild(testsupport.WriteConfigFile(t, nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.MetricsPrefix() != "scraper" {
+		t.Errorf("MetricsPrefix() = %q with no metricsPrefix field, want scraper", cfg.MetricsPrefix())
+	}
+
+	cfg, err = FileBuild(testsupport.WriteConfigFile(t, map[string]interface{}{"metricsPrefix": "acme"}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.MetricsPrefix() != "acme" {
+		t.Errorf("MetricsPrefix() = %q, want acme", cfg.MetricsPrefix())
+	}
+}
+
 // The optionals block may be left out.
 func TestFileBuildAllowsMissingOptionals(t *testing.T) {
 	path := testsupport.WriteConfigFile(t, map[string]interface{}{"optionals": nil})
@@ -88,6 +108,9 @@ func TestFileBuildRefusesABadConfig(t *testing.T) {
 		{"interval of zero", map[string]interface{}{"interval": "0s"}, "interval"},
 		{"negative interval", map[string]interface{}{"interval": "-5s"}, "interval"},
 		{"optionals of the wrong shape", map[string]interface{}{"optionals": "none"}, "optionals"},
+		{"metrics prefix with a dot", map[string]interface{}{"metricsPrefix": "metric.scraper"}, "metricsPrefix"},
+		{"metrics prefix that is not a string", map[string]interface{}{"metricsPrefix": 7}, "metricsPrefix"},
+		{"empty metrics prefix", map[string]interface{}{"metricsPrefix": ""}, "metricsPrefix"},
 		// A field may be empty only when nothing reads it: the service kind looks its target up
 		// by disco, and the opentsdb sink looks OpenTSDB up by metric.
 		{"service kind with an empty disco", map[string]interface{}{"kind": "service", "disco": ""}, "disco"},

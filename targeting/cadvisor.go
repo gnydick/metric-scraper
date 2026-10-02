@@ -7,6 +7,7 @@ import (
 	c "github.com/gnydick/metric-scraper/config"
 	e "github.com/gnydick/metric-scraper/emitters"
 	k "github.com/gnydick/metric-scraper/sink"
+	"github.com/gnydick/metric-scraper/telemetry"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -18,11 +19,13 @@ type Cadvisor struct {
 	scheme    string
 	sink      k.Sink
 	clientset kubernetes.Interface
+	// telemetry is handed to each emitter. It may be nil.
+	telemetry *telemetry.Telemetry
 }
 
 // NewCadvisor builds the Kubernetes client once, from the config. A client config that cannot be
 // built is an error for the caller to report at startup, never a panic (#17).
-func NewCadvisor(configPtr *c.Config, scheme string, sink k.Sink) (Cadvisor, error) {
+func NewCadvisor(configPtr *c.Config, scheme string, sink k.Sink, tel *telemetry.Telemetry) (Cadvisor, error) {
 	restConfig, err := k8sConfig(configPtr)
 	if err != nil {
 		return Cadvisor{}, fmt.Errorf("kubernetes client config for mode %q: %w", configPtr.Mode(), err)
@@ -36,6 +39,7 @@ func NewCadvisor(configPtr *c.Config, scheme string, sink k.Sink) (Cadvisor, err
 		scheme:    scheme,
 		sink:      sink,
 		clientset: clientset,
+		telemetry: tel,
 	}, nil
 }
 
@@ -69,7 +73,7 @@ func (c Cadvisor) EmitterPtrs(ctx context.Context) ([]e.Emitter, error) {
 	for i, node := range nodes.Items {
 		newInst := node // have to create a new instance as 'node' gets destroyed in each loop
 		// if node.Name == "ip-10-90-8-99.us-west-2.compute.internal" {
-		emitter := e.NewCadvisor(c.sink, c.configPtr, &newInst)
+		emitter := e.NewCadvisor(c.sink, c.configPtr, &newInst, c.telemetry)
 		// emitters[0] = emitter
 		emitters[i] = emitter
 		// }

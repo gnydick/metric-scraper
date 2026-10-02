@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"time"
+
+	"github.com/gnydick/metric-scraper/telemetry"
 )
 
 // Kind is what the scraper scrapes.
@@ -46,6 +48,12 @@ type Config struct {
 	sink         SinkKind
 	mode         Mode
 	optionals    map[string]map[string]string
+	// metricsPrefix starts every name on the scraper's own metrics page.
+	metricsPrefix string
+}
+
+func (c *Config) MetricsPrefix() string {
+	return c.metricsPrefix
 }
 
 func (c Config) init() {
@@ -272,6 +280,19 @@ func validate(data map[string]interface{}) (Config, error) {
 		return Config{}, fmt.Errorf("field %q must be a map of maps of strings", "optionals")
 	}
 	configuration.optionals = optionals
+
+	// metricsPrefix may be left out. When present it must be able to start a metric name (#53).
+	configuration.metricsPrefix = telemetry.DefaultPrefix
+	if value, present := data["metricsPrefix"]; present {
+		prefix, isString := value.(string)
+		if !isString {
+			return Config{}, fmt.Errorf("field %q must be a string", "metricsPrefix")
+		}
+		if err := telemetry.CheckPrefix(prefix); err != nil {
+			return Config{}, fmt.Errorf("field %q: %w", "metricsPrefix", err)
+		}
+		configuration.metricsPrefix = prefix
+	}
 
 	return configuration, nil
 }

@@ -47,9 +47,9 @@ func TestScrapeRoundCutsAHungScanOffAfterOneInterval(t *testing.T) {
 	// not cut off fails this test cleanly instead of crashing on a missing sink.
 	sink := &idleSink{metrics: make(chan *m.Metric, 16)}
 	target := &fakeTarget{discover: func(ctx context.Context) ([]emitters.Emitter, error) {
-		return []emitters.Emitter{emitters.NewService(sink, nil, srv.URL, "app=x")}, nil
+		return []emitters.Emitter{emitters.NewService(sink, nil, srv.URL, "app=x", nil)}, nil
 	}}
-	s := newTestScraper(target, time.Now(), interval)
+	s := newTestScraper(t, target)
 
 	roundBegan := time.Now()
 	s.scrapeRound(interval)
