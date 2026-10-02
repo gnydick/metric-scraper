@@ -30,7 +30,16 @@
 - A counter's name ends in `_total`.
 - A dimension goes in a label, not in the name. One name covers every component; a label says which.
 - The owner's example in that form: `<prefix>_sink_up{sink="opentsdb",name="one"} 1` and `<prefix>_sink_up{sink="opentsdb",name="two"} 0`.
-- Not yet decided by the owner: the prefix, the label names, and which return codes are counted.
+
+## Owner decisions, 2026-10-01
+
+- Given in conversation, as answers to questions about this specification.
+- Prefix: `scraper_`, and it is configurable. The owner asked about a dot (`metric.scraper_`), then chose this.
+- Up/down gauges: each sink (today the one OpenTSDB sink), and each scan target.
+- No up/down gauge for target discovery.
+- Counters: sink writes by result; OpenTSDB rejections by kind; scans by HTTP status; discovery rounds by result.
+- The page is produced with the Prometheus client library for Go. The owner approved that dependency.
+- Not yet decided by the owner: the label names, the page's path, and what `/healthz` returns in its body.
 
 ## Glossary
 
