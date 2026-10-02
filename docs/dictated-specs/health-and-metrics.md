@@ -52,7 +52,9 @@
   - The prefix is set by the optional config field `metricsPrefix`. Its default is `scraper`.
   - A scan target is up when its last fetch succeeded with a 2xx status.
   - A target that is no longer discovered leaves the page.
-- Not decided by the owner: what the target gauges show while discovery itself is failing. Today they keep their last values.
+- The owner then decided, when approving the merge:
+  - While discovery itself is failing, the target gauges keep their last values.
+  - The library's Go runtime and process metrics stay on the page. They do not carry the prefix.
 
 ## Glossary
 
