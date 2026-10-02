@@ -2,11 +2,9 @@ package emitters
 
 import (
 	"bufio"
-	"crypto/tls"
+	"context"
 	"fmt"
-	"io/ioutil"
 	"k8s.io/api/core/v1"
-	"net/http"
 	"strings"
 	"time"
 
@@ -47,81 +45,73 @@ func (c Cadvisor) GetName() string {
 	return c.node.Name
 }
 
-func (c Cadvisor) Scan() {
+func (c Cadvisor) Scan(ctx context.Context) {
 	DebugLog("Starting scan on %s", c.node.Name)
 
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	resp, err := http.Get(c.url)
-
+	body, err := fetch(ctx, c.url)
 	if err != nil {
 		ErrorLog("%s", err.Error())
-	} else {
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			ErrorLog("%s", err.Error())
-		} else {
-			scanner := bufio.NewScanner(strings.NewReader(string(body)))
+		return
+	}
 
-			newMetric := false
-			gotType := false
-			sinkChan := c.sink.GetChannel()
-			// DebugLog("About to scan file")
-			for scanner.Scan() {
-				now := time.Now()
-				nanos := now.UnixNano()
-				millis := nanos / 1000000
-				line := scanner.Text()
-				matched := strings.HasPrefix(line, "# HELP ")
-				if matched == true {
-					gotType = false
-					unwanted := strings.HasSuffix(line, "Unix creation timestamp")
-					if unwanted == false {
-						newMetric = true
-					}
-				} else if newMetric == true {
-					matched := strings.HasPrefix(line, "# TYPE ")
-					if matched == true {
-						newMetric = false
-						gotType = true
-					}
-				} else if gotType == true {
-					metric, err := c.parseLine(millis, line)
-					if err != nil {
-						logSkipped(line, err)
-						continue
-					}
-					(*metric).Tags["node"] = (*c.node).Name
-					c.ds.RegisterMetric(metric)
+	scanner := bufio.NewScanner(strings.NewReader(string(body)))
 
-				}
-
+	newMetric := false
+	gotType := false
+	sinkChan := c.sink.GetChannel()
+	// DebugLog("About to scan file")
+	for scanner.Scan() {
+		now := time.Now()
+		nanos := now.UnixNano()
+		millis := nanos / 1000000
+		line := scanner.Text()
+		matched := strings.HasPrefix(line, "# HELP ")
+		if matched == true {
+			gotType = false
+			unwanted := strings.HasSuffix(line, "Unix creation timestamp")
+			if unwanted == false {
+				newMetric = true
 			}
-
-			var nodes = 0
-			for _, node := range *c.ds.GetNodes() {
-				nodes += 1
-				mets := 0
-				// DebugLog(fmt.Sprintf("%d Containers", nodes))
-				for _, metric := range *node.GetMetrics() {
-					mets += 1
-					// DebugLog(fmt.Sprintf("%d metrics", mets))
-					*sinkChan <- metric
-				}
+		} else if newMetric == true {
+			matched := strings.HasPrefix(line, "# TYPE ")
+			if matched == true {
+				newMetric = false
+				gotType = true
 			}
-
-			conts := 0
-			for _, container := range *c.ds.GetContainers() {
-				conts += 1
-				mets := 0
-				// DebugLog(fmt.Sprintf("%d Containers", conts))
-				for _, metric := range *container.GetMetrics() {
-					mets += 1
-					// DebugLog(fmt.Sprintf("%d metrics", mets))
-					*sinkChan <- metric
-				}
+		} else if gotType == true {
+			metric, err := c.parseLine(millis, line)
+			if err != nil {
+				logSkipped(line, err)
+				continue
 			}
+			(*metric).Tags["node"] = (*c.node).Name
+			c.ds.RegisterMetric(metric)
+
+		}
+
+	}
+
+	var nodes = 0
+	for _, node := range *c.ds.GetNodes() {
+		nodes += 1
+		mets := 0
+		// DebugLog(fmt.Sprintf("%d Containers", nodes))
+		for _, metric := range *node.GetMetrics() {
+			mets += 1
+			// DebugLog(fmt.Sprintf("%d metrics", mets))
+			*sinkChan <- metric
 		}
 	}
 
+	conts := 0
+	for _, container := range *c.ds.GetContainers() {
+		conts += 1
+		mets := 0
+		// DebugLog(fmt.Sprintf("%d Containers", conts))
+		for _, metric := range *container.GetMetrics() {
+			mets += 1
+			// DebugLog(fmt.Sprintf("%d metrics", mets))
+			*sinkChan <- metric
+		}
+	}
 }

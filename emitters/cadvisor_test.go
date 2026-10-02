@@ -1,6 +1,7 @@
 package emitters
 
 import (
+	"context"
 	"strings"
 	"testing"
 
@@ -18,7 +19,7 @@ func TestScanLogsFetchErrorTextExactly(t *testing.T) {
 		node: &v1.Node{ObjectMeta: metav1.ObjectMeta{Name: "node-a"}},
 	}
 
-	logged := testsupport.CaptureStdout(t, emitter.Scan)
+	logged := testsupport.CaptureStdout(t, func() { emitter.Scan(context.Background()) })
 
 	// The observer is alive only if an error line was printed at all. Off Windows the library wraps
 	// the level in colour codes, so the brackets are not next to it.

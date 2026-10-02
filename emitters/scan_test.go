@@ -1,6 +1,7 @@
 package emitters
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -95,7 +96,7 @@ func TestServiceScanSkipsBadLines(t *testing.T) {
 		"things{kind=\"c\"} 2\n"
 
 	sent, logged := scanAndCollect(t, body, func(url string, sink *fakeSink) {
-		Service{url: url, identTag: "app=x", sink: sink, serviceData: dataSvc.NewServiceData()}.Scan()
+		Service{url: url, identTag: "app=x", sink: sink, serviceData: dataSvc.NewServiceData()}.Scan(context.Background())
 	})
 
 	want := []string{"things=1", "things=2"}
@@ -117,7 +118,7 @@ func TestScanLogsEachSkipByCause(t *testing.T) {
 		"things{kind=\"x=y\"} 1\n"
 
 	sent, logged := scanAndCollect(t, body, func(url string, sink *fakeSink) {
-		Service{url: url, identTag: "app=x", sink: sink, serviceData: dataSvc.NewServiceData()}.Scan()
+		Service{url: url, identTag: "app=x", sink: sink, serviceData: dataSvc.NewServiceData()}.Scan(context.Background())
 	})
 
 	if len(sent) != 0 {
@@ -151,7 +152,7 @@ func TestCadvisorScanSkipsBadLines(t *testing.T) {
 
 	node := &v1.Node{ObjectMeta: metav1.ObjectMeta{Name: "node-a"}}
 	sent, logged := scanAndCollect(t, body, func(url string, sink *fakeSink) {
-		Cadvisor{url: url, sink: sink, ds: dataCadv.NewDataSet(node), node: node}.Scan()
+		Cadvisor{url: url, sink: sink, ds: dataCadv.NewDataSet(node), node: node}.Scan(context.Background())
 	})
 
 	want := []string{"container_a=1", "container_c=2"}

@@ -88,7 +88,8 @@ func (s *Scraper) Healthy(now time.Time) bool {
 }
 
 // scrapeRound discovers the targets and starts a scan of each. Discovery gets one interval; if it
-// fails or runs out of time the round is skipped and the next interval tries again.
+// fails or runs out of time the round is skipped and the next interval tries again. Each scan's
+// fetch also gets one interval, so a target that hangs cannot hold a scan for good (#21).
 func (s *Scraper) scrapeRound(interval time.Duration) {
 	ctx, cancel := context.WithTimeout(context.Background(), interval)
 	found, err := s.target.EmitterPtrs(ctx)
@@ -101,6 +102,10 @@ func (s *Scraper) scrapeRound(interval time.Duration) {
 
 	for _, emitter := range found {
 		s.emitters[emitter.GetName()] = &emitter
-		go emitter.Scan()
+		go func(emitter emitters.Emitter) {
+			scanCtx, cancelScan := context.WithTimeout(context.Background(), interval)
+			defer cancelScan()
+			emitter.Scan(scanCtx)
+		}(emitter)
 	}
 }

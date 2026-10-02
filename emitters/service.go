@@ -2,10 +2,7 @@ package emitters
 
 import (
 	"bufio"
-	"crypto/tls"
-	"io/ioutil"
-
-	"net/http"
+	"context"
 	"strings"
 	"time"
 
@@ -45,17 +42,15 @@ func (svc Service) GetName() string {
 	return svc.identTag
 }
 
-func (svc Service) Scan() {
+func (svc Service) Scan(ctx context.Context) {
 	DebugLog("Starting scan")
 
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	resp, err := http.Get(svc.url)
-
+	// A failed fetch is logged and the scan ends, as in the cadvisor emitter. It is not a panic (#21).
+	body, err := fetch(ctx, svc.url)
 	if err != nil {
-		panic(err)
+		ErrorLog("%s", err.Error())
+		return
 	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
 
 	scanner := bufio.NewScanner(strings.NewReader(string(body)))
 
