@@ -213,4 +213,11 @@ func TestNilTelemetryRecordsNothing(t *testing.T) {
 	tel.Scan("cadvisor", "node-a", 200, nil)
 	tel.DiscoveryRound("cadvisor", nil)
 	tel.KeepTargets("cadvisor", nil)
+
+	// With nothing recorded there is no page to serve: the handler answers 404, it does not panic.
+	rec := httptest.NewRecorder()
+	tel.Handler().ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/metrics", nil))
+	if rec.Code != http.StatusNotFound {
+		t.Errorf("a nil Telemetry's page answered %d, want 404", rec.Code)
+	}
 }

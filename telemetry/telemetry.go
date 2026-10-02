@@ -97,8 +97,11 @@ func New(prefix string) (*Telemetry, error) {
 	return t, nil
 }
 
-// Handler serves the metrics page.
+// Handler serves the metrics page. A nil Telemetry has no page, so its handler answers 404.
 func (t *Telemetry) Handler() http.Handler {
+	if t == nil {
+		return http.NotFoundHandler()
+	}
 	return promhttp.HandlerFor(t.registry, promhttp.HandlerOpts{Registry: t.registry})
 }
 

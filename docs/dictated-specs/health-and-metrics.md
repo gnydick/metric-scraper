@@ -39,7 +39,20 @@
 - No up/down gauge for target discovery.
 - Counters: sink writes by result; OpenTSDB rejections by kind; scans by HTTP status; discovery rounds by result.
 - The page is produced with the Prometheus client library for Go. The owner approved that dependency.
-- Not yet decided by the owner: the label names, the page's path, and what `/healthz` returns in its body.
+- The owner then accepted the assistant's plan for the rest, and said to delete `scraper.Progress`:
+  - The page is at `/metrics`, on the same port as `/healthz`.
+  - `/healthz` returns the plain text `OK`. The earlier JSON report is gone.
+  - The names and labels are:
+    - `scraper_sink_up{sink,endpoint}`
+    - `scraper_target_up{kind,target}`
+    - `scraper_sink_writes_total{sink,result}`
+    - `scraper_sink_rejections_total{sink,kind}`
+    - `scraper_scans_total{kind,code}`
+    - `scraper_discovery_rounds_total{kind,result}`
+  - The prefix is set by the optional config field `metricsPrefix`. Its default is `scraper`.
+  - A scan target is up when its last fetch succeeded with a 2xx status.
+  - A target that is no longer discovered leaves the page.
+- Not decided by the owner: what the target gauges show while discovery itself is failing. Today they keep their last values.
 
 ## Glossary
 
