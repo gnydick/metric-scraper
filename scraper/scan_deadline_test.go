@@ -27,7 +27,7 @@ func (s *idleSink) GetChannel() *chan *m.Metric { return &s.metrics }
 // request and never answers; the round's scan must give up, which the server sees as its request
 // being cancelled.
 func TestScrapeRoundCutsAHungScanOffAfterOneInterval(t *testing.T) {
-	interval := 300 * time.Millisecond
+	interval := time.Second
 
 	scanGaveUp := make(chan struct{}, 1)
 	release := make(chan struct{})
@@ -51,12 +51,21 @@ func TestScrapeRoundCutsAHungScanOffAfterOneInterval(t *testing.T) {
 	}}
 	s := newTestScraper(target, time.Now(), interval)
 
+	roundBegan := time.Now()
 	s.scrapeRound(interval)
 
 	select {
 	case <-scanGaveUp:
 	case <-time.After(30 * time.Second):
 		// Generous on purpose: a scan with no deadline never gives up.
-		t.Fatal("the hung scan was still running 30s into a 300ms interval")
+		t.Fatal("the hung scan was still running 30s into a 1s interval")
+	}
+
+	// The bound is one interval: the scan cannot give up sooner, and a bound of two intervals or
+	// more would give up later than this. The upper limit leaves one whole interval of slack for a
+	// slow machine.
+	heldFor := time.Since(roundBegan)
+	if heldFor < interval || heldFor >= 2*interval {
+		t.Errorf("the hung scan gave up after %v, want at least %v and less than %v", heldFor, interval, 2*interval)
 	}
 }
